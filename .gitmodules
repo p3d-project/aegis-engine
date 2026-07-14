@@ -1,0 +1,6 @@
+[submodule "libs/fpm"]
+	path = libs/fpm
+	url = https://github.com/MikeLankamp/fpm.git
+[submodule "libs/etl"]
+	path = libs/etl
+	url = https://github.com/ETLCPP/etl.git

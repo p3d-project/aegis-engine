@@ -1,0 +1,36 @@
+{
+    "configurations": [
+        {
+            "name": "NDS",
+            "compilerPath": "${env:DEVKITPRO}/devkitARM/bin/arm-none-eabi-g++",
+            "intelliSenseMode": "gcc-arm",
+            "forcedInclude": [
+                "${workspaceFolder}/.vscode/vscode_fix.h"
+            ],
+            "includePath": [
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/libs/**",
+                "${env:DEVKITPRO}/libnds/include/**",
+                "${env:DEVKITPRO}/devkitARM/arm-none-eabi/include/**",
+                "${env:DEVKITPRO}/calico/include"
+            ],
+            "defines": [
+                "__NDS__",
+                "ARM9",
+                "ENVIRONMENT_BUILD",
+                "_DEBUG"
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/include",
+                    "${env:DEVKITPRO}/libnds/include",
+                    "${env:DEVKITPRO}/devkitARM/arm-none-eabi/include"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

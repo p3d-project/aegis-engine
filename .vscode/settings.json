@@ -1,0 +1,19 @@
+{
+    // Search and UI cleanup
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+    },
+    "search.exclude": {},
+    // Formatting
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "files.eol": "\n",
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "editor.formatOnSave": true,
+    // C++ IntelliSense
+    "C_Cpp.intelliSenseEngine": "default",
+    "C_Cpp.formatting": "default",
+    "C_Cpp.errorSquiggles": "enabled",
+}

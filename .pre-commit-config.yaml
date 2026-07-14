@@ -1,0 +1,10 @@
+repos:
+  # C/C++ - clang-format via the clang-format-wheel Python package.
+  # pre-commit installs this into an isolated env, so no system clang-format needed.
+  # --style=file tells clang-format to walk up and find .clang-format at the repo root.
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v19.1.7
+    hooks:
+      - id: clang-format
+        types_or: [c, c++]
+        args: [--style=file]
