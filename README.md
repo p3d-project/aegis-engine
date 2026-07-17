@@ -167,6 +167,12 @@ int main()
 
 All capacity constraints (e.g., maximum entities, maximum components per entity, maximum routers) are strictly defined as `constexpr` defaults within `<aegis/types.hpp>`. You can override these defaults per-project by explicitly passing template arguments when instantiating your `ae::Engine`.
 
+---
+
+![Alt](https://repobeats.axiom.co/api/embed/688e10f06f887746a68124a2d64b2da43f99ff19.svg "Repobeats analytics image")
+
+---
+
 ## Legal
 ### License
 The codebase is licensed under the Creative Commons **Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0).**
