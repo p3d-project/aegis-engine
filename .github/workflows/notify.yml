@@ -2,7 +2,7 @@ name: Discord Notification
 
 on:
   workflow_run:
-    workflows: ["depoly-workflow-name"]
+    workflows: ["my-deploy-name"]
     types: [completed]
 
   # Fires when a PR is opened, closed, or reopened.
