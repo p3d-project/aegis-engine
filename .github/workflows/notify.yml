@@ -1,0 +1,196 @@
+name: Discord Notification
+
+on:
+  workflow_run:
+    workflows: ["depoly-workflow-name"]
+    types: [completed]
+
+  # Fires when a PR is opened, closed, or reopened.
+  pull_request_target:
+    types: [opened, closed, reopened]
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  notify-build:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_run'
+
+    steps:
+      # Only present on non-PR runs (PRs don't generate a version tag).
+      # continue-on-error ensures PR builds still notify even without the artifact.
+      - name: Download version artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-version
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Notify Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          JOB_STATUS:      ${{ github.event.workflow_run.conclusion }}
+          EVENT:           ${{ github.event.workflow_run.event }}
+          PR_NUMBER:       ${{ github.event.workflow_run.pull_requests[0].number }}
+          BRANCH:          ${{ github.event.workflow_run.head_branch }}
+          COMMIT_SHA:      ${{ github.event.workflow_run.head_sha }}
+          ACTOR:           ${{ github.event.workflow_run.triggering_actor.login }}
+          BASE_REPO:       ${{ github.event.workflow_run.repository.full_name }}
+          HEAD_REPO:       ${{ github.event.workflow_run.head_repository.full_name }}
+          SERVER_URL:      ${{ github.server_url }}
+          RUN_ID:          ${{ github.event.workflow_run.id }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "DISCORD_WEBHOOK secret not configured — skipping notification"
+            exit 0
+          fi
+
+          case "$JOB_STATUS" in
+            success)   COLOR=3066993;  EMOJI="✅" ;;
+            cancelled) COLOR=9807270;  EMOJI="⏹️" ;;
+            *)         COLOR=15158332; EMOJI="❌" ;;
+          esac
+
+          SHORT_SHA="${COMMIT_SHA:0:7}"
+          IS_PR="false"
+          [ "$EVENT" = "pull_request" ] && IS_PR="true"
+
+          FORK_FIELD='[]'
+          if [ "$HEAD_REPO" != "$BASE_REPO" ]; then
+            FORK_LABEL=" [fork: ${HEAD_REPO}]"
+            FORK_FIELD=$(jq -n --arg repo "$HEAD_REPO" \
+              '[{ name: "Fork", value: $repo, inline: false }]')
+          else
+            FORK_LABEL=""
+          fi
+
+          if [ "$IS_PR" = "true" ] && [ -n "$PR_NUMBER" ]; then
+            TITLE="${EMOJI} PR #${PR_NUMBER} — Build ${JOB_STATUS}${FORK_LABEL}"
+            URL="${SERVER_URL}/${BASE_REPO}/pull/${PR_NUMBER}"
+            BUILD_TYPE="Pull Request #${PR_NUMBER}"
+          else
+            TITLE="${EMOJI} Build ${JOB_STATUS}: ${BRANCH}@${SHORT_SHA}${FORK_LABEL}"
+            URL="${SERVER_URL}/${BASE_REPO}/actions/runs/${RUN_ID}"
+            BUILD_TYPE="Push to ${BRANCH}"
+          fi
+
+          jq -n \
+            --arg     title      "$TITLE"      \
+            --arg     url        "$URL"        \
+            --argjson color      "$COLOR"      \
+            --arg     build_type "$BUILD_TYPE" \
+            --arg     branch     "$BRANCH"     \
+            --arg     sha        "$SHORT_SHA"  \
+            --arg     actor      "$ACTOR"      \
+            --argjson fork_field "$FORK_FIELD" \
+            '{
+              embeds: [{
+                title:  $title,
+                color:  $color,
+                url:    $url,
+                fields: ($fork_field + [
+                  { name: "Build",     value: $build_type, inline: false },
+                  { name: "Branch",    value: $branch,     inline: true  },
+                  { name: "Commit",    value: $sha,        inline: true  },
+                  { name: "Triggered", value: $actor,      inline: true  }
+                ])
+              }]
+            }' \
+          | curl -sf -X POST "$DISCORD_WEBHOOK" \
+              -H "Content-Type: application/json" \
+              -d @-
+
+  notify-pr:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request_target'
+
+    steps:
+      - name: Notify Discord PR channel
+        env:
+          DISCORD_PR_WEBHOOK: ${{ secrets.DISCORD_PR_WEBHOOK }}
+          ACTION:      ${{ github.event.action }}
+          PR_NUMBER:   ${{ github.event.pull_request.number }}
+          PR_TITLE:    ${{ github.event.pull_request.title }}
+          PR_URL:      ${{ github.event.pull_request.html_url }}
+          PR_AUTHOR:   ${{ github.event.pull_request.user.login }}
+          AUTHOR_URL:  ${{ github.event.pull_request.user.html_url }}
+          BRANCH:      ${{ github.event.pull_request.head.ref }}
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          MERGED:      ${{ github.event.pull_request.merged }}
+          REPO:        ${{ github.repository }}
+          SERVER_URL:  ${{ github.server_url }}
+          BODY:        ${{ github.event.pull_request.body }}
+        run: |
+          if [ -z "$DISCORD_PR_WEBHOOK" ]; then
+            echo "DISCORD_PR_WEBHOOK secret not configured — skipping PR notification"
+            exit 0
+          fi
+
+          case "$ACTION" in
+            opened)
+              COLOR=5793266   # Blue
+              EMOJI="🟢"
+              STATUS="Opened"
+              ;;
+            closed)
+              if [ "$MERGED" = "true" ]; then
+                COLOR=8311585  # Purple
+                EMOJI="🟣"
+                STATUS="Merged"
+              else
+                COLOR=15158332 # Red
+                EMOJI="🔴"
+                STATUS="Closed (unmerged)"
+              fi
+              ;;
+            reopened)
+              COLOR=16776960  # Yellow
+              EMOJI="🔁"
+              STATUS="Reopened"
+              ;;
+            *)
+              COLOR=9807270
+              EMOJI="ℹ️"
+              STATUS="$ACTION"
+              ;;
+          esac
+
+          # Truncate PR body to 200 chars for the description field.
+          DESCRIPTION=""
+          if [ -n "$BODY" ]; then
+            DESCRIPTION=$(echo "$BODY" | head -c 200)
+            [ ${#BODY} -gt 200 ] && DESCRIPTION="${DESCRIPTION}…"
+          fi
+
+          jq -n \
+            --arg  emoji       "$EMOJI"       \
+            --arg  pr_number   "$PR_NUMBER"   \
+            --arg  status      "$STATUS"      \
+            --arg  pr_title    "$PR_TITLE"    \
+            --arg  pr_url      "$PR_URL"      \
+            --argjson color    "$COLOR"       \
+            --arg  description "$DESCRIPTION" \
+            --arg  pr_author   "$PR_AUTHOR"   \
+            --arg  author_url  "$AUTHOR_URL"  \
+            --arg  branch      "$BRANCH"      \
+            --arg  base_branch "$BASE_BRANCH" \
+            --arg  repo        "$REPO"        \
+            '{
+              embeds: [{
+                title:       "\($emoji) PR #\($pr_number) \($status): \($pr_title)",
+                color:       $color,
+                url:         $pr_url,
+                description: (if $description != "" then $description else null end),
+                fields: [
+                  { name: "Author",  value: "[`\($pr_author)`](\($author_url))", inline: true  },
+                  { name: "Branch",  value: "`\($branch)` → `\($base_branch)`", inline: false },
+                  { name: "Repo",    value: $repo,                               inline: true  }
+                ]
+              }]
+            }' \
+          | curl -sf -X POST "$DISCORD_PR_WEBHOOK" \
+              -H "Content-Type: application/json" \
+              -d @-
