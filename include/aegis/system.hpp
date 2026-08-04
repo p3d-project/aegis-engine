@@ -52,6 +52,16 @@ class System
         return nullptr;
     }
 
+    /**
+     * @brief Checks if the system is active.
+     *
+     * @return true if the system is active, false otherwise.
+     */
+    bool IsActive()
+    {
+        return isActive;
+    }
+
   protected:
     System() = default;
 
