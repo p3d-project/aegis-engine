@@ -13,7 +13,7 @@
  *       corresponding "send" half of Pub/Sub.
  */
 
-#include "types.hpp"
+#include <aegis/types.hpp>
 #include <etl/message_router.h>
 
 namespace aegis

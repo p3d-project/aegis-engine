@@ -11,6 +11,7 @@
  *       Components hand data to them (one-way, not Pub/Sub).
  */
 
+#include <aegis/types.hpp>
 namespace aegis
 {
 // =============================================================================
