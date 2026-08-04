@@ -305,7 +305,10 @@ class Engine
 
         for (System* s : systems)
         {
-            s->Update(dt);
+            if (s->isActive)
+            {
+                s->Update(dt);
+            }
         }
 
         for (Entity* e : activeEntities)
