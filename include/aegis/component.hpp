@@ -57,6 +57,16 @@ class Component
     /// @return This component's game-defined type identifier.
     virtual ComponentTypeID GetType() const = 0;
 
+    /**
+     * @brief Checks if the component is active.
+     *
+     * @return true if the component is active, false otherwise.
+     */
+    bool IsActive()
+    {
+        return isActive;
+    }
+
     /// @return The Entity this component is attached to, or `nullptr`.
     Entity* GetOwner() const
     {
@@ -94,6 +104,12 @@ class Component
      * per component" without type erasure, which we want to avoid.
      */
     virtual void SubmitToManager() = 0;
+
+    /**
+     * @brief Whether this component's `Update` should run its logic this
+     *        frame. Toggled by concrete subclasses.
+     */
+    bool isActive = false;
 
     /// The Entity that owns this component (set via `SetOwner`).
     Entity* owner = nullptr;
