@@ -180,7 +180,10 @@ inline void Entity::Update(fixed_t dt)
 {
     for (Component* c : components)
     {
-        c->Update(dt);
+        if (c->IsActive())
+        {
+            c->Update(dt);
+        }
     }
 }
 
