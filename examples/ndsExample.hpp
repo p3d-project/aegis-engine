@@ -11,13 +11,13 @@
  *
  * This example specifically walks through the FULL Pub/Sub cycle in both
  * directions:
- *   1. Component -> System: `HealthComponent::TakeDamage()` broadcasts a
+ *   1. Component -> System: `HealthComponent::takeDamage()` broadcasts a
  *      `StartBattleSystem` event followed by a `Damage` event.
  *   2. System -> Component: `BattleSystem` receives that `Damage` event,
  *      applies a rule, and broadcasts a `State` event back out.
  *   3. Component -> Manager: `MeshComponent` submits render data directly
  *      to `RenderManager` (one-way, not Pub/Sub, see
- *      `Component::SubmitToManager`).
+ *      `Component::submitToManager`).
  */
 
 #include <aegis/component.hpp>
@@ -69,13 +69,13 @@ enum : etl::message_id_t
 /**
  * @brief POD messages broadcast over `engineBus` via `BroadcastEvent(...)`.
  *
- *  A "Start[SystemName]System" event (see StartBattleSystem` below) is
- *  reserved for Component -> System activation.
+ * A "Start[SystemName]System" event (see StartBattleSystem` below) is
+ * reserved for Component -> System activation.
  *
  * @note These are NOT aggregates (they inherit from `etl::message<ID>`, a
  *       polymorphic base), so brace-init like `Event::Damage{15, 0}` will
  *       fail to compile. Default-construct then assign fields instead.
- *       See `HealthComponent::TakeDamage` for the pattern.
+ *       See `HealthComponent::takeDamage` for the pattern.
  */
 namespace Event
 {
@@ -104,13 +104,13 @@ struct State : public etl::message<EventID::ChangeState>
 };
 
 /**
-     * @brief Component -> System: wakes `BattleSystem` up for this frame.
-     *
-     * Empty payload. This event exists purely to flip `BattleSystem`'s
-     * `isActive` flag on, per the HLD's "Update Frequency" rule that
-     * Systems "exit update early if false" and "toggle their own flag
-     * based on events received from pub/sub".
-     */
+ * @brief Component -> System: wakes `BattleSystem` up for this frame.
+ *
+ * Empty payload. This event exists purely to flip `BattleSystem`'s
+ * `isActive` flag on, per the HLD's "Update Frequency" rule that
+ * Systems "exit update early if false" and "toggle their own flag
+ * based on events received from pub/sub".
+ */
 struct StartBattleSystem : public etl::message<EventID::StartBattleSystem>
 {
 };
@@ -148,13 +148,13 @@ struct CollisionHitbox
 class RenderManager : public ae::Manager, public ae::Singleton<RenderManager>
 {
   public:
-    void Init() override
+    void init() override
     {
     }
-    void Process() override
+    void process() override
     {
     }
-    void Shutdown() override
+    void shutdown() override
     {
     }
 
@@ -163,7 +163,7 @@ class RenderManager : public ae::Manager, public ae::Singleton<RenderManager>
      *        class docs for why this isn't a generic virtual).
      * @param data Mesh/model transform to render this frame.
      */
-    void SubmitData(const Payload::RenderMesh& data)
+    void submitData(const Payload::RenderMesh& data)
     { /* push to VRAM, etc. */
     }
 
@@ -180,7 +180,7 @@ class RenderManager : public ae::Manager, public ae::Singleton<RenderManager>
  * @brief Example Component: tracks HP, and demonstrates the full two-way
  *        Pub/Sub cycle.
  *
- * - **Sends**: `TakeDamage()` broadcasts `Event::StartBattleSystem` then
+ * - **Sends**: `takeDamage()` broadcasts `Event::StartBattleSystem` then
  *   `Event::Damage`, an external caller (input, collision, script) drives
  *   gameplay by calling this, which is how "Component -> System" traffic
  *   usually originates in practice.
@@ -191,17 +191,17 @@ class HealthComponent : public ae::ComponentRouter<HealthComponent, Event::State
 {
   public:
     static constexpr ae::ComponentTypeID TYPE_ID = static_cast<ae::ComponentTypeID>(ComponentType::Health);
-    void Init() override
+    void init() override
     {
         currentHP = 100;
     }
-    void Update(ae::fixed_t /*dt*/) override
+    void update(ae::fixed_t /*dt*/) override
     {
     }
-    void Destroy() override
+    void destroy() override
     {
     }
-    ae::ComponentTypeID GetType() const override
+    ae::ComponentTypeID getType() const override
     {
         return TYPE_ID;
     }
@@ -211,25 +211,25 @@ class HealthComponent : public ae::ComponentRouter<HealthComponent, Event::State
      *        apply damage to this entity.
      *
      * This is where a "send" originates: broadcasting `StartBattleSystem`
-     * first ensures `BattleSystem` is active before its `Update()` runs
+     * first ensures `BattleSystem` is active before its `update()` runs
      * this frame, then `Damage` carries the actual payload for the system
      * to process.
      * @param amount  Raw damage amount.
      * @param element Elemental type id (game-defined).
      */
-    void TakeDamage(std::int32_t amount, std::int32_t element)
+    void takeDamage(std::int32_t amount, std::int32_t element)
     {
-        ENGINE_TRACE("[HealthComponent] TakeDamage(%ld) HP before=%ld\n", (long)amount, (long)currentHP);
-        ae::BroadcastEvent(Event::StartBattleSystem{});
+        ENGINE_TRACE("[HealthComponent] takeDamage(%ld) HP before=%ld\n", (long)amount, (long)currentHP);
+        ae::broadcastEvent(Event::StartBattleSystem{});
 
         Event::Damage msg;
         msg.amount = amount;
         msg.element = element;
-        ae::BroadcastEvent(msg);
+        ae::broadcastEvent(msg);
     }
 
     /// Debug/testing accessor — not required by the engine itself.
-    std::int32_t GetCurrentHP() const
+    std::int32_t getCurrentHP() const
     {
         return currentHP;
     }
@@ -253,7 +253,7 @@ class HealthComponent : public ae::ComponentRouter<HealthComponent, Event::State
     }
 
   protected:
-    void SubmitToManager() override
+    void submitToManager() override
     {
     }
 
@@ -271,25 +271,25 @@ class MeshComponent : public ae::Component
 {
   public:
     static constexpr ae::ComponentTypeID TYPE_ID = static_cast<ae::ComponentTypeID>(ComponentType::Mesh);
-    void Init() override
+    void init() override
     {
     }
-    void Update(ae::fixed_t /*dt*/) override
+    void update(ae::fixed_t /*dt*/) override
     {
-        SubmitToManager();
+        submitToManager();
     }
-    void Destroy() override
+    void destroy() override
     {
     }
-    ae::ComponentTypeID GetType() const override
+    ae::ComponentTypeID getType() const override
     {
         return TYPE_ID;
     }
 
   protected:
-    void SubmitToManager() override
+    void submitToManager() override
     {
-        RenderManager::GetInstance().SubmitData(Payload::RenderMesh{modelID, {}});
+        RenderManager::getInstance().submitData(Payload::RenderMesh{modelID, {}});
     }
 
   private:
@@ -309,17 +309,17 @@ constexpr etl::message_router_id_t kBattleSystemRouterID = 0;
  *
  * - **Receives**: `on_receive(const Event::StartBattleSystem&)` flips
  *   `isActive` on; `on_receive(const Event::Damage&)` queues a rule to run.
- * - **Sends**: after `Update()` processes a queued hit, it broadcasts
+ * - **Sends**: after `update()` processes a queued hit, it broadcasts
  *   `Event::State` so components (e.g. `HealthComponent`) can react.
  */
 class BattleSystem : public ae::SystemRouter<BattleSystem, Event::Damage, Event::StartBattleSystem>,
                      public ae::Singleton<BattleSystem>
 {
   public:
-    void Init() override
+    void init() override
     {
     }
-    void Shutdown() override
+    void shutdown() override
     {
     }
 
@@ -328,7 +328,7 @@ class BattleSystem : public ae::SystemRouter<BattleSystem, Event::Damage, Event:
      *        applies the queued damage rule otherwise, then broadcasts
      *        the result.
      */
-    void Update(ae::fixed_t /*dt*/) override
+    void update(ae::fixed_t /*dt*/) override
     {
         if (!isActive)
         {
@@ -340,7 +340,7 @@ class BattleSystem : public ae::SystemRouter<BattleSystem, Event::Damage, Event:
         const std::int32_t appliedAmount = pendingDamageAmount;
         const std::int32_t resultingStateID = appliedAmount > 0 ? 1 /* "Hurt" */ : 0 /* "Idle" */;
 
-        ENGINE_TRACE("[BattleSystem] Update: applying rule -> amount=%ld, newState=%ld\n",
+        ENGINE_TRACE("[BattleSystem] update: applying rule -> amount=%ld, newState=%ld\n",
                      (long)appliedAmount,
                      (long)resultingStateID);
 
@@ -348,21 +348,21 @@ class BattleSystem : public ae::SystemRouter<BattleSystem, Event::Damage, Event:
         Event::State msg;
         msg.newStateID = resultingStateID;
         msg.appliedAmount = appliedAmount;
-        ae::BroadcastEvent(msg);
+        ae::broadcastEvent(msg);
 
         pendingDamageAmount = 0;
-        isActive = false; // done processing; wait for the next StartBattleSystem
+        active = false; // done processing; wait for the next StartBattleSystem
     }
 
     /// Component -> System: activation event, per the HLD's reserved
     /// "Start[SystemName]System" naming convention.
     void on_receive(const Event::StartBattleSystem&)
     {
-        isActive = true;
+        active = true;
         ENGINE_TRACE("[BattleSystem] <- StartBattleSystem (isActive=true)\n");
     }
 
-    /// Component -> System: queues the hit for `Update()` to process.
+    /// Component -> System: queues the hit for `update()` to process.
     void on_receive(const Event::Damage& msg)
     {
         pendingDamageAmount = msg.amount;
@@ -403,16 +403,16 @@ constexpr std::size_t kLargestComponentAlign = alignof(HealthComponent) > aligno
 using GameEngine = ae::Engine<GameEngineConfig::kLargestComponentSize, GameEngineConfig::kLargestComponentAlign>;
 
 // =============================================================================
-// Example hardware hooks (HAL design, see Engine::SetPollInputCallback)
+// Example hardware hooks (HAL design, see Engine::setPollInputCallback)
 // =============================================================================
 
 /// Stand-in for reading button/touch state each frame.
-void MyInputPoller()
+void myInputPoller()
 { /* read gamepad state */
 }
 
 /// Stand-in for the final "push everything to hardware" step each frame.
-void MyComputePusher()
+void myComputePusher()
 { /* swap buffers, push to VRAM */
 }
 
@@ -427,27 +427,27 @@ int ndsExampleMain()
     static GameEngine engine;
 
     // 2. Register singletons.
-    engine.RegisterManager(&RenderManager::GetInstance());
-    engine.RegisterSystem(&BattleSystem::GetInstance());
+    engine.registerManager(&RenderManager::getInstance());
+    engine.registerSystem(&BattleSystem::getInstance());
 
     // 3. Wire up platform hooks (HAL design, Engine itself stays hardware-agnostic).
-    engine.SetPollInputCallback(&MyInputPoller);
-    engine.SetComputeCallback(&MyComputePusher);
+    engine.setPollInputCallback(&myInputPoller);
+    engine.setComputeCallback(&myComputePusher);
 
     // 4. Initialize everything (Systems first, then Managers).
-    engine.InitAll();
+    engine.initAll();
 
     // 5. Set up initial game state.
-    ae::Entity* player = engine.CreateEntity();
+    ae::Entity* player = engine.createEntity();
     HealthComponent* health = nullptr;
 
     if (player != nullptr)
     {
-        health = engine.CreateComponent<HealthComponent>();
-        MeshComponent* mesh = engine.CreateComponent<MeshComponent>();
+        health = engine.createComponent<HealthComponent>();
+        MeshComponent* mesh = engine.createComponent<MeshComponent>();
 
-        player->AddComponent(health);
-        player->AddComponent(mesh);
+        player->addComponent(health);
+        player->addComponent(mesh);
     }
 
     // Fixed-point delta time, expressed in seconds (~16.67ms at 60 FPS).
@@ -465,10 +465,10 @@ int ndsExampleMain()
         // whole Pub/Sub cycle from section 1 of the file comment above.
         if (frameCount == 0 && health != nullptr)
         {
-            health->TakeDamage(15, /*element=*/0);
+            health->takeDamage(15, /*element=*/0);
         }
 
-        engine.Tick(dt); // Poll Input -> Update Systems -> Update Components -> Process Managers -> Compute
+        engine.tick(dt); // Poll Input -> Update Systems -> Update Components -> Process Managers -> Compute
 
         if (++frameCount >= 3)
         {
@@ -477,7 +477,7 @@ int ndsExampleMain()
     }
 
     // 7. Cleanup memory and hardware state.
-    engine.ShutdownAll();
+    engine.shutdownAll();
 
     return 0;
 }
@@ -486,16 +486,16 @@ int ndsExampleMain()
 // =============================================================================
 // Engine test, run in main.cpp to ensure engine is working properly
 // =============================================================================
-void NDSPollInputCallback()
+void ndsPollInputCallback()
 {
     scanKeys();
 
     // ex. pass the states to Managers here
     // uint32_t keys_pressed = keysDown();
-    // InputManager::GetInstance().Update(keys_pressed);
+    // InputManager::getInstance().update(keys_pressed);
 }
 
-void NDSComputeCallback()
+void ndsComputeCallback()
 {
     //...
 }
@@ -505,27 +505,27 @@ void ndsExampleTest()
     iprintf("Engine test\n");
 
     static GameEngine engine;
-    engine.SetComputeCallback(&NDSComputeCallback);
-    engine.SetComputeEnabled(true);
-    engine.SetPollInputCallback(&NDSPollInputCallback);
-    engine.SetPollingEnabled(true);
+    engine.setComputeCallback(&ndsComputeCallback);
+    engine.setComputeEnabled(true);
+    engine.setPollInputCallback(&ndsPollInputCallback);
+    engine.setPollingEnabled(true);
 
-    engine.RegisterManager(&RenderManager::GetInstance());
-    engine.RegisterSystem(&BattleSystem::GetInstance());
+    engine.registerManager(&RenderManager::getInstance());
+    engine.registerSystem(&BattleSystem::getInstance());
 
-    engine.InitAll();
+    engine.initAll();
 
-    ae::Entity* e = engine.CreateEntity();
-    HealthComponent* hc = engine.CreateComponent<HealthComponent>();
-    e->AddComponent(hc);
+    ae::Entity* e = engine.createEntity();
+    HealthComponent* hc = engine.createComponent<HealthComponent>();
+    e->addComponent(hc);
 
-    iprintf("Initial HP: %d\n", hc->GetCurrentHP());
-    hc->TakeDamage(15, 0);
-    engine.Tick(ae::fixed_t(1) / 60);
-    iprintf("Final HP: %d\n", hc->GetCurrentHP());
+    iprintf("Initial HP: %d\n", hc->getCurrentHP());
+    hc->takeDamage(15, 0);
+    engine.tick(ae::fixed_t(1) / 60);
+    iprintf("Final HP: %d\n", hc->getCurrentHP());
 
-    engine.DestroyComponent(hc);
-    engine.DestroyEntity(e);
-    engine.ShutdownAll();
+    engine.destroyComponent(hc);
+    engine.destroyEntity(e);
+    engine.shutdownAll();
 }
 #endif
