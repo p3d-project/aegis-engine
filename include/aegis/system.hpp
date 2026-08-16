@@ -32,22 +32,22 @@ class System
     virtual ~System() = default;
 
     /// Called once at startup.
-    virtual void Init() = 0;
+    virtual void init() = 0;
 
     /**
      * @brief Per-frame update, called from `Engine::Tick`.
      * @param dt Fixed-point delta time for this frame.
      */
-    virtual void Update(fixed_t dt) = 0;
+    virtual void update(fixed_t dt) = 0;
 
     /// Called once at shutdown.
-    virtual void Shutdown() = 0;
+    virtual void shutdown() = 0;
 
     /**
      * @brief Returns this system as an `etl::imessage_router` if it
      *        participates in Pub/Sub, or `nullptr` if it doesn't.
      */
-    virtual etl::imessage_router* AsMessageRouter()
+    virtual etl::imessage_router* asMessageRouter()
     {
         return nullptr;
     }
@@ -57,9 +57,9 @@ class System
      *
      * @return true if the system is active, false otherwise.
      */
-    bool IsActive()
+    bool isActive()
     {
-        return isActive;
+        return active;
     }
 
   protected:
@@ -71,7 +71,7 @@ class System
      *        received from `engineBus` (e.g. a
      *        "Start[SystemName]System" event).
      */
-    bool isActive = false;
+    bool active = false;
 };
 
 /**
@@ -103,7 +103,7 @@ class SystemRouter : public System, public etl::message_router<TDerived, TMessag
     {
     }
 
-    etl::imessage_router* AsMessageRouter() override
+    etl::imessage_router* asMessageRouter() override
     {
         return static_cast<etl::message_router<TDerived, TMessageTypes...>*>(this);
     }
