@@ -118,8 +118,8 @@ inline void Entity::addComponent(Component* c)
         return;
     }
 
-    c->SetOwner(this);
-    c->Init();
+    c->setOwner(this);
+    c->init();
     components.push_back(c);
 }
 
@@ -127,7 +127,7 @@ inline Component* Entity::getComponentByID(ComponentTypeID type) const
 {
     for (Component* c : components)
     {
-        if (c->GetType() == type)
+        if (c->getType() == type)
         {
             return c;
         }
@@ -147,9 +147,9 @@ inline void Entity::removeComponentByID(ComponentTypeID type)
 {
     for (auto it = components.begin(); it != components.end(); ++it)
     {
-        if ((*it)->GetType() == type)
+        if ((*it)->getType() == type)
         {
-            (*it)->Destroy();
+            (*it)->destroy();
             components.erase(it);
             return;
         }
@@ -180,9 +180,9 @@ inline void Entity::update(fixed_t dt)
 {
     for (Component* c : components)
     {
-        if (c->IsActive())
+        if (c->isActive())
         {
-            c->Update(dt);
+            c->update(dt);
         }
     }
 }
@@ -191,7 +191,7 @@ inline void Entity::destroy()
 {
     for (Component* c : components)
     {
-        c->Destroy();
+        c->destroy();
     }
     components.clear();
 }
