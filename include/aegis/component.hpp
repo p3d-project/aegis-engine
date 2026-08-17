@@ -142,7 +142,7 @@ class ComponentRouter : public Component, public etl::message_router<TDerived, T
 {
   public:
     /// @param routerID Defaults to an auto-assigned unique id per instance.
-    explicit ComponentRouter(etl::message_router_id_t routerID = detail::NextComponentRouterID())
+    explicit ComponentRouter(etl::message_router_id_t routerID = detail::nextComponentRouterID())
         : etl::message_router<TDerived, TMessageTypes...>(routerID)
     {
     }

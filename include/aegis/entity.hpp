@@ -161,7 +161,7 @@ template <typename T> inline void Entity::removeComponent()
     static_assert(detail::has_type_id<T>::value,
                   "\n\n[AE ERROR]: Component is missing its TYPE_ID\n"
                   "You must define: static constexpr ComponentTypeID TYPE_ID = ...\n");
-    RemoveComponentByID(T::TYPE_ID);
+    removeComponentByID(T::TYPE_ID);
 }
 
 inline void Entity::detachComponent(Component* c)
