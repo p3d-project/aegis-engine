@@ -98,7 +98,7 @@ inline etl::message_bus<EngineLimits::MAX_MESSAGE_ROUTERS> engineBus;
  *                   `Event` namespace convention in the companion example).
  * @param msg The event instance to broadcast.
  */
-template <typename TMessage> inline void BroadcastEvent(const TMessage& msg)
+template <typename TMessage> inline void broadcastEvent(const TMessage& msg)
 {
     engineBus.receive(msg);
 }
@@ -113,7 +113,7 @@ namespace detail
  * (see `SystemRouter`), since a monotonic counter isn't needed for a
  * type that only ever has one instance.
  */
-inline etl::message_router_id_t NextComponentRouterID()
+inline etl::message_router_id_t nextComponentRouterID()
 {
     static etl::message_router_id_t next = 0;
     return next++;
@@ -154,7 +154,7 @@ template <typename TDerived> class Singleton
      * @brief Returns the single instance of TDerived, constructing it on
      *        first use.
      */
-    static TDerived& GetInstance()
+    static TDerived& getInstance()
     {
         static TDerived instance;
         return instance;

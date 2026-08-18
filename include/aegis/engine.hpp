@@ -4,8 +4,8 @@
  * @file engine.hpp
  * @brief Aegis Engine — `Engine<...>`: owns the Entity/Component pools,
  *        the System/Manager registry, and drives the Core Engine Loop
- *        (Poll Input -> Update Systems -> Update Components -> Process
- *        Managers -> Compute).
+ *        (poll input -> update systems -> update components -> process
+ *        managers -> compute).
  *
  * @note All pool/registry capacities are template parameters, not
  *       hardcoded constants — size `Engine` per project/platform via
@@ -45,9 +45,9 @@ namespace aegis
  * @endcode
  *
  * @tparam ComponentBlockSize  Byte size of the largest concrete Component
- *                             type the game will allocate (`sizeof(T)`).
+ *                           type the game will allocate (`sizeof(T)`).
  * @tparam ComponentBlockAlign Alignment of the largest concrete Component
- *                             type the game will allocate (`alignof(T)`).
+ *                           type the game will allocate (`alignof(T)`).
  * @tparam MaxEntities         Max simultaneous Entities.
  * @tparam MaxComponents       Max simultaneous Components (all entities combined).
  * @tparam MaxSystems          Max registered Systems.
@@ -67,7 +67,7 @@ class Engine
     // --- Entity lifecycle -----------------------------------------------
 
     /// @return A freshly allocated, empty Entity, or `nullptr` if the entity pool/registry is full.
-    Entity* CreateEntity()
+    Entity* createEntity()
     {
         if (activeEntities.full())
         {
@@ -85,16 +85,16 @@ class Engine
     /**
      * @brief Destroys all of the entity's components and returns the
      *        entity itself to the pool.
-     * @param entity Entity previously returned by `CreateEntity`.
+     * @param entity Entity previously returned by `createEntity`.
      */
-    void DestroyEntity(Entity* entity)
+    void destroyEntity(Entity* entity)
     {
         if (entity == nullptr)
         {
             return;
         }
 
-        entity->Destroy();
+        entity->destroy();
 
         for (auto it = activeEntities.begin(); it != activeEntities.end(); ++it)
         {
@@ -117,7 +117,7 @@ class Engine
      * @tparam Args Constructor argument types, forwarded to `T`'s constructor.
      * @return Pointer to the new component, or `nullptr` if the pool is exhausted.
      */
-    template <typename T, typename... Args> T* CreateComponent(Args&&... args)
+    template <typename T, typename... Args> T* createComponent(Args&&... args)
     {
         static_assert(std::is_base_of<Component, T>::value, "\n\n[AE ERROR]: T must derive from Component");
         static_assert(detail::has_type_id<T>::value,
@@ -127,13 +127,13 @@ class Engine
         T* component = componentPool.template create<T>(std::forward<Args>(args)...);
         if (component != nullptr)
         {
-            RegisterComponentForMessaging(component);
+            registerComponentForMessaging(component);
         }
         return component;
     }
 
     /**
-     * @brief Fully retires a component: calls `Destroy()`, detaches it from
+     * @brief Fully retires a component: calls `destroy()`, detaches it from
      *        its owning Entity (if any), unsubscribes it from `engineBus`
      *        (if applicable), and returns its memory to the pool.
      *
@@ -141,23 +141,23 @@ class Engine
      * owning Entity's internal list in sync, unlike freeing the pool slot
      * directly.
      * @tparam T Concrete Component subclass (must match the allocated type).
-     * @param component Pointer previously returned by `CreateComponent`.
+     * @param component Pointer previously returned by `createComponent`.
      */
-    template <typename T> void DestroyComponent(T* component)
+    template <typename T> void destroyComponent(T* component)
     {
         if (component == nullptr)
         {
             return;
         }
 
-        component->Destroy();
+        component->destroy();
 
-        if (Entity* owner = component->GetOwner())
+        if (Entity* owner = component->getOwner())
         {
-            owner->DetachComponent(component);
+            owner->detachComponent(component);
         }
 
-        if (etl::imessage_router* router = component->AsMessageRouter())
+        if (etl::imessage_router* router = component->asMessageRouter())
         {
             engineBus.unsubscribe(*router);
         }
@@ -167,19 +167,19 @@ class Engine
 
     /**
      * @brief Subscribes a component to `engineBus` if it participates in
-     *        Pub/Sub. Called automatically by `CreateComponent`; exposed
+     *        Pub/Sub. Called automatically by `createComponent`; exposed
      *        publicly for components constructed outside the pool (e.g. in
      *        unit tests).
      * @param component The component to register.
      */
-    void RegisterComponentForMessaging(Component* component)
+    void registerComponentForMessaging(Component* component)
     {
         if (component == nullptr)
         {
             return;
         }
 
-        if (etl::imessage_router* router = component->AsMessageRouter())
+        if (etl::imessage_router* router = component->asMessageRouter())
         {
             engineBus.subscribe(*router);
         }
@@ -188,11 +188,11 @@ class Engine
     // --- System / Manager registration -----------------------------------
 
     /**
-     * @brief Registers a System so `Tick` calls its `Update` each frame,
+     * @brief Registers a System so `tick` calls its `update` each frame,
      *        subscribing it to `engineBus` if it participates in Pub/Sub.
-     * @param system Typically `&SomeSystem::GetInstance()`.
+     * @param system Typically `&SomeSystem::getInstance()`.
      */
-    void RegisterSystem(System* system)
+    void registerSystem(System* system)
     {
         if (system == nullptr || systems.full())
         {
@@ -201,17 +201,17 @@ class Engine
 
         systems.push_back(system);
 
-        if (etl::imessage_router* router = system->AsMessageRouter())
+        if (etl::imessage_router* router = system->asMessageRouter())
         {
             engineBus.subscribe(*router);
         }
     }
 
     /**
-     * @brief Registers a Manager so `Tick` calls its `Process` each frame.
-     * @param manager Typically `&SomeManager::GetInstance()`.
+     * @brief Registers a Manager so `tick` calls its `process` each frame.
+     * @param manager Typically `&SomeManager::getInstance()`.
      */
-    void RegisterManager(Manager* manager)
+    void registerManager(Manager* manager)
     {
         if (manager == nullptr || managers.full())
         {
@@ -223,29 +223,29 @@ class Engine
 
     // --- Loop control -------------------------------------------------------
 
-    /// Calls `Init()` on every registered System, then every registered Manager.
-    void InitAll()
+    /// Calls `init()` on every registered System, then every registered Manager.
+    void initAll()
     {
         for (System* s : systems)
         {
-            s->Init();
+            s->init();
         }
         for (Manager* m : managers)
         {
-            m->Init();
+            m->init();
         }
     }
 
-    /// Calls `Shutdown()` on every registered Manager, then every registered System.
-    void ShutdownAll()
+    /// Calls `shutdown()` on every registered Manager, then every registered System.
+    void shutdownAll()
     {
         for (Manager* m : managers)
         {
-            m->Shutdown();
+            m->shutdown();
         }
         for (System* s : systems)
         {
-            s->Shutdown();
+            s->shutdown();
         }
     }
 
@@ -253,7 +253,7 @@ class Engine
      * @brief Toggles the input polling
      * @param enabled
      */
-    void SetPollingEnabled(bool enabled)
+    void setPollingEnabled(bool enabled)
     {
         isPollingEnabled = enabled;
     }
@@ -262,39 +262,39 @@ class Engine
      * @brief Toggles the compute execution
      * @param enabled
      */
-    void SetComputeEnabled(bool enabled)
+    void setComputeEnabled(bool enabled)
     {
         isComputeEnabled = enabled;
     }
 
     /**
      * @brief Installs the platform-specific input-polling hook, called at
-     *        the start of every `Tick`. Left injectable (rather than
+     *        the start of every `tick`. Left injectable (rather than
      *        hardcoded) to keep `Engine` hardware-agnostic. Only Managers
      *        may touch hardware directly, and the function supplied here is
      *        expected to itself delegate to a Manager.
      */
-    void SetPollInputCallback(void (*fn)())
+    void setPollInputCallback(void (*fn)())
     {
         pollInputFn = fn;
     }
 
     /**
      * @brief Installs the platform-specific "push final data to hardware"
-     *        hook, called at the end of every `Tick`. Same rationale as
-     *        `SetPollInputCallback`.
+     *        hook, called at the end of every `tick`. Same rationale as
+     *        `setPollInputCallback`.
      */
-    void SetComputeCallback(void (*fn)())
+    void setComputeCallback(void (*fn)())
     {
         computeFn = fn;
     }
 
     /**
      * @brief Runs one iteration of the Core Engine Loop:
-     *        Poll Input -> Update Systems -> Update Components -> Process Managers -> Compute.
+     *        poll input -> update systems -> update components -> process managers -> compute.
      * @param dt Fixed-point delta time for this frame.
      */
-    void Tick(fixed_t dt)
+    void tick(fixed_t dt)
     {
         if (isPollingEnabled)
         {
@@ -305,20 +305,20 @@ class Engine
 
         for (System* s : systems)
         {
-            if (s->IsActive())
+            if (s->isActive())
             {
-                s->Update(dt);
+                s->update(dt);
             }
         }
 
         for (Entity* e : activeEntities)
         {
-            e->Update(dt);
+            e->update(dt);
         }
 
         for (Manager* m : managers)
         {
-            m->Process();
+            m->process();
         }
 
         if (isComputeEnabled)

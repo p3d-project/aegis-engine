@@ -43,38 +43,38 @@ class Component
     virtual ~Component() = default;
 
     /// Called once when the component is attached to an Entity.
-    virtual void Init() = 0;
+    virtual void init() = 0;
 
     /**
-     * @brief Per-frame update, called from `Entity::Update`.
+     * @brief Per-frame update, called from `Entity::update`.
      * @param dt Fixed-point delta time for this frame.
      */
-    virtual void Update(fixed_t dt) = 0;
+    virtual void update(fixed_t dt) = 0;
 
     /// Called when the component is detached/destroyed.
-    virtual void Destroy() = 0;
+    virtual void destroy() = 0;
 
     /// @return This component's game-defined type identifier.
-    virtual ComponentTypeID GetType() const = 0;
+    virtual ComponentTypeID getType() const = 0;
 
     /**
      * @brief Checks if the component is active.
      *
      * @return true if the component is active, false otherwise.
      */
-    bool IsActive()
+    bool isActive()
     {
-        return isActive;
+        return active;
     }
 
     /// @return The Entity this component is attached to, or `nullptr`.
-    Entity* GetOwner() const
+    Entity* getOwner() const
     {
         return owner;
     }
 
     /// @param entity The Entity that now owns this component.
-    void SetOwner(Entity* entity)
+    void setOwner(Entity* entity)
     {
         owner = entity;
     }
@@ -86,7 +86,7 @@ class Component
      * `Engine` uses this to decide whether to subscribe/unsubscribe a
      * component to/from `engineBus`. Overridden by `ComponentRouter`.
      */
-    virtual etl::imessage_router* AsMessageRouter()
+    virtual etl::imessage_router* asMessageRouter()
     {
         return nullptr;
     }
@@ -99,19 +99,19 @@ class Component
      * Deliberately takes no generic parameter: each concrete component
      * knows exactly which Manager singleton and payload type it submits to
      * (e.g. a MeshComponent calls
-     * `RenderManager::GetInstance().SubmitData(Payload::RenderMesh{...})`).
+     * `RenderManager::getInstance().submitData(Payload::RenderMesh{...})`).
      * A single virtual signature can't express "a different payload type
      * per component" without type erasure, which we want to avoid.
      */
-    virtual void SubmitToManager() = 0;
+    virtual void submitToManager() = 0;
 
     /**
-     * @brief Whether this component's `Update` should run its logic this
+     * @brief Whether this component's `update` should run its logic this
      *        frame. Toggled by concrete subclasses.
      */
-    bool isActive = false;
+    bool active = false;
 
-    /// The Entity that owns this component (set via `SetOwner`).
+    /// The Entity that owns this component (set via `setOwner`).
     Entity* owner = nullptr;
 };
 
@@ -126,7 +126,7 @@ class Component
  * public:
  *     void on_receive(const Event::Damage& msg) { ... }
  *     void on_receive_unknown(const etl::imessage&) {}
- *     // ... Init/Update/Destroy/GetType/SubmitToManager ...
+ *     // ... init/update/destroy/getType/submitToManager ...
  * };
  * @endcode
  *
@@ -142,12 +142,12 @@ class ComponentRouter : public Component, public etl::message_router<TDerived, T
 {
   public:
     /// @param routerID Defaults to an auto-assigned unique id per instance.
-    explicit ComponentRouter(etl::message_router_id_t routerID = detail::NextComponentRouterID())
+    explicit ComponentRouter(etl::message_router_id_t routerID = detail::nextComponentRouterID())
         : etl::message_router<TDerived, TMessageTypes...>(routerID)
     {
     }
 
-    etl::imessage_router* AsMessageRouter() override
+    etl::imessage_router* asMessageRouter() override
     {
         return static_cast<etl::message_router<TDerived, TMessageTypes...>*>(this);
     }

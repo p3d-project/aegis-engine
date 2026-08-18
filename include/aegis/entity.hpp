@@ -38,7 +38,7 @@ class Entity
     }
 
     /// @return This entity's unique identifier.
-    EntityID GetID() const
+    EntityID getID() const
     {
         return entityID;
     }
@@ -48,20 +48,20 @@ class Entity
      *        and calls its `Init()`.
      * @param c Pointer to a Component allocated by `Engine`.
      */
-    void AddComponent(Component* c);
+    void addComponent(Component* c);
 
     /**
      * @param type The `ComponentTypeID` to search for.
      * @return The first attached Component of the given type, or `nullptr`.
      */
-    Component* GetComponentByID(ComponentTypeID type) const;
+    Component* getComponentByID(ComponentTypeID type) const;
 
     /**
      * @brief Retrieves and safely casts a Component of the specified type.
      * @tparam T The concrete Component type (must define `TYPE_ID`).
      * @return Pointer to the component, or nullptr if not found.
      */
-    template <typename T> T* GetComponent() const;
+    template <typename T> T* getComponent() const;
 
     /**
      * @brief Detaches the Component of the given type, calling its
@@ -72,13 +72,13 @@ class Entity
      *       one call without double-invoking `Destroy()`).
      * @param type The `ComponentTypeID` to remove.
      */
-    void RemoveComponentByID(ComponentTypeID type);
+    void removeComponentByID(ComponentTypeID type);
 
     /**
      * @brief Detaches and destroys a Component of the specified type.
      * @tparam T The concrete Component type (must define `TYPE_ID`).
      */
-    template <typename T> void RemoveComponent();
+    template <typename T> void removeComponent();
 
     /**
      * @brief Removes a component pointer from this entity's internal list
@@ -90,17 +90,17 @@ class Entity
      * for normal use; this is a low-level building block for those.
      * @param c The component pointer to detach. No-op if not found.
      */
-    void DetachComponent(Component* c);
+    void detachComponent(Component* c);
 
     /**
      * @brief Calls `Update(dt)` on every attached Component, per the Core
      *        Engine Loop's "Update Components" step.
      * @param dt Fixed-point delta time for this frame.
      */
-    void Update(fixed_t dt);
+    void update(fixed_t dt);
 
     /// Destroys (but does not free) all attached components.
-    void Destroy();
+    void destroy();
 
   private:
     EntityID entityID = 0;
@@ -111,23 +111,23 @@ class Entity
 // Entity method implementations
 // =============================================================================
 
-inline void Entity::AddComponent(Component* c)
+inline void Entity::addComponent(Component* c)
 {
     if (c == nullptr || components.full())
     {
         return;
     }
 
-    c->SetOwner(this);
-    c->Init();
+    c->setOwner(this);
+    c->init();
     components.push_back(c);
 }
 
-inline Component* Entity::GetComponentByID(ComponentTypeID type) const
+inline Component* Entity::getComponentByID(ComponentTypeID type) const
 {
     for (Component* c : components)
     {
-        if (c->GetType() == type)
+        if (c->getType() == type)
         {
             return c;
         }
@@ -135,7 +135,7 @@ inline Component* Entity::GetComponentByID(ComponentTypeID type) const
     return nullptr;
 }
 
-template <typename T> inline T* Entity::GetComponent() const
+template <typename T> inline T* Entity::getComponent() const
 {
     static_assert(detail::has_type_id<T>::value,
                   "\n\n[AE ERROR]: Component is missing its TYPE_ID\n"
@@ -143,28 +143,28 @@ template <typename T> inline T* Entity::GetComponent() const
     return static_cast<T*>(GetComponentByID(T::TYPE_ID));
 }
 
-inline void Entity::RemoveComponentByID(ComponentTypeID type)
+inline void Entity::removeComponentByID(ComponentTypeID type)
 {
     for (auto it = components.begin(); it != components.end(); ++it)
     {
-        if ((*it)->GetType() == type)
+        if ((*it)->getType() == type)
         {
-            (*it)->Destroy();
+            (*it)->destroy();
             components.erase(it);
             return;
         }
     }
 }
 
-template <typename T> inline void Entity::RemoveComponent()
+template <typename T> inline void Entity::removeComponent()
 {
     static_assert(detail::has_type_id<T>::value,
                   "\n\n[AE ERROR]: Component is missing its TYPE_ID\n"
                   "You must define: static constexpr ComponentTypeID TYPE_ID = ...\n");
-    RemoveComponentByID(T::TYPE_ID);
+    removeComponentByID(T::TYPE_ID);
 }
 
-inline void Entity::DetachComponent(Component* c)
+inline void Entity::detachComponent(Component* c)
 {
     for (auto it = components.begin(); it != components.end(); ++it)
     {
@@ -176,22 +176,22 @@ inline void Entity::DetachComponent(Component* c)
     }
 }
 
-inline void Entity::Update(fixed_t dt)
+inline void Entity::update(fixed_t dt)
 {
     for (Component* c : components)
     {
-        if (c->IsActive())
+        if (c->isActive())
         {
-            c->Update(dt);
+            c->update(dt);
         }
     }
 }
 
-inline void Entity::Destroy()
+inline void Entity::destroy()
 {
     for (Component* c : components)
     {
-        c->Destroy();
+        c->destroy();
     }
     components.clear();
 }

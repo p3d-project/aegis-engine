@@ -40,12 +40,12 @@ class Manager
     virtual ~Manager() = default;
 
     /// Called once at startup.
-    virtual void Init() = 0;
+    virtual void init() = 0;
 
     /// Called once per frame, per the Core Engine Loop's "Process Managers" step.
-    virtual void Process() = 0;
+    virtual void process() = 0;
 
     /// Called once at shutdown.
-    virtual void Shutdown() = 0;
+    virtual void shutdown() = 0;
 };
 } // namespace aegis
