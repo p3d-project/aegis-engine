@@ -1,0 +1,75 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 23,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "host-debug",
+            "displayName": "Aegis Host Debug",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/out/build/host-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "AEGIS_BUILD_TESTS": "ON"
+            }
+        },
+        {
+            "name": "host-release",
+            "displayName": "Aegis Host Release",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/out/build/host-release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "AEGIS_BUILD_TESTS": "ON"
+            }
+        },
+        {
+            "name": "host-no-tests",
+            "displayName": "Aegis Host (Library Only)",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/out/build/host-no-tests",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "AEGIS_BUILD_TESTS": "OFF"
+            }
+        },
+        {
+            "name": "default",
+            "displayName": "Default (Host Debug)",
+            "inherits": "host-debug"
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "build-tests",
+            "displayName": "Build Aegis Tests",
+            "configurePreset": "host-debug",
+            "targets": [
+                "aegis_test"
+            ]
+        },
+        {
+            "name": "build-lib",
+            "displayName": "Configure Library Interface",
+            "configurePreset": "host-no-tests"
+        },
+        {
+            "name": "default",
+            "displayName": "Default (Build Tests)",
+            "inherits": "build-tests"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "test-host",
+            "displayName": "Run Aegis Host Tests",
+            "configurePreset": "host-debug",
+            "output": {
+                "outputOnFailure": true
+            }
+        }
+    ]
+}
