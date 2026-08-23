@@ -32,10 +32,16 @@ using EntityID = std::uint32_t;
 /**
  * @brief Engine-wide fixed-point type (Q16.16 signed).
  *
- * Assume no FPU, so all game-logic math (positions, damage rolls, timers,
- * delta-time, etc.) must go through this type instead of float/double.
+ * Replaces floats since NDS lacks an fpu.
  */
-using fixed_t = fpm::fixed<std::int32_t, std::int64_t, 16>;
+using q16_16_t = fpm::fixed<std::int32_t, std::int64_t, 16>;
+
+/**
+ * @brief Engine-wide fixed-point type (Q20.12 signed).
+ *
+ * Replaces floats since NDS lacks an fpu.
+ */
+using q20_12_t = fpm::fixed<std::int32_t, std::int64_t, 12>;
 
 /**
  * @brief Generic identifier for a concrete Component's "type".
