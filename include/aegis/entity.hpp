@@ -123,9 +123,6 @@ class Entity
      */
     void Update(fixed_t dt);
 
-    /// Destroys (but does not free) all attached components.
-    void Destroy();
-
   private:
     EntityID entityID = 0;
     etl::vector<Component*, EngineLimits::MAX_COMPONENTS_PER_ENTITY> components;
@@ -212,15 +209,5 @@ inline void Entity::Update(fixed_t dt)
             c->Update(dt);
         }
     }
-}
-
-inline void Entity::Destroy()
-{
-    for (Component* c : components)
-    {
-        c->Destroy();
-        c->SetOwner(nullptr);
-    }
-    components.clear();
 }
 } // namespace aegis

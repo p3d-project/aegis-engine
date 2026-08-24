@@ -51,7 +51,7 @@ class Component
      */
     virtual void Update(fixed_t dt) = 0;
 
-    /// Called when the component is detached/destroyed.
+    /// Deallocates memory, & resets state. Called when the component is destroyed
     virtual void Destroy() = 0;
 
     /// @return This component's game-defined type identifier.
