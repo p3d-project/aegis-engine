@@ -83,8 +83,11 @@ class Engine
     }
 
     /**
-     * @brief Destroys all of the entity's components and returns the
-     *        entity itself to the pool.
+     * @brief Fully retires an Entity and all of its attached Components.
+     *
+     * This tears down each Component in-place, detaches it from the owner,
+     * disconnects any message routing, returns its memory to the shared
+     * component pool, and finally releases the Entity back to the entity pool.
      * @param entity Entity previously returned by `CreateEntity`.
      */
     void DestroyEntity(Entity* entity)
@@ -94,7 +97,25 @@ class Engine
             return;
         }
 
-        entity->Destroy();
+        while (entity->GetComponentCount() > 0)
+        {
+            Component* component = entity->GetComponentAt(0);
+            if (component == nullptr)
+            {
+                break;
+            }
+
+            component->Destroy();
+            entity->DetachComponent(component);
+            component->SetOwner(nullptr);
+
+            if (etl::imessage_router* router = component->AsMessageRouter())
+            {
+                engineBus.unsubscribe(*router);
+            }
+
+            componentPool.destroy(component);
+        }
 
         for (auto it = activeEntities.begin(); it != activeEntities.end(); ++it)
         {
@@ -106,6 +127,25 @@ class Engine
         }
 
         entityPool.destroy(entity);
+    }
+
+    /**
+     * @brief Returns how many Entities are currently active in the engine.
+     * @return Number of live Entities tracked by the engine.
+     */
+    std::size_t GetActiveEntityCount() const
+    {
+        return activeEntities.size();
+    }
+
+    /**
+     * @brief Returns how many Components are currently allocated from the
+     *        shared component pool.
+     * @return Number of live Components currently owned by the engine.
+     */
+    std::size_t GetActiveComponentCount() const
+    {
+        return componentPool.available() == 0 ? MaxComponents : MaxComponents - componentPool.available();
     }
 
     // --- Component lifecycle ---------------------------------------------
@@ -156,6 +196,8 @@ class Engine
         {
             owner->DetachComponent(component);
         }
+
+        component->SetOwner(nullptr);
 
         if (etl::imessage_router* router = component->AsMessageRouter())
         {
