@@ -30,13 +30,6 @@ namespace aegis
 using EntityID = std::uint32_t;
 
 /**
- * @brief Engine-wide General purpose fixed-point type (Q16.16 signed).
- *
- * Replaces floats since NDS lacks an fpu.
- */
-using q16_16_t = fpm::fixed<std::int32_t, std::int64_t, 16>;
-
-/**
  * @brief Engine-wide General purpose fixed-point type (Q20.12 signed).
  *
  * Replaces floats since NDS lacks an fpu.
