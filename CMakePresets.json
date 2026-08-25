@@ -8,7 +8,7 @@
     "configurePresets": [
         {
             "name": "host-debug",
-            "displayName": "Aegis Host Debug",
+            "displayName": "Aegis Engine Host Debug",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/out/build/host-debug",
             "cacheVariables": {
@@ -18,7 +18,7 @@
         },
         {
             "name": "host-release",
-            "displayName": "Aegis Host Release",
+            "displayName": "Aegis Engine Host Release",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/out/build/host-release",
             "cacheVariables": {
@@ -28,7 +28,7 @@
         },
         {
             "name": "host-no-tests",
-            "displayName": "Aegis Host (Library Only)",
+            "displayName": "Aegis Engine Host (Library Only)",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/out/build/host-no-tests",
             "cacheVariables": {
@@ -45,15 +45,15 @@
     "buildPresets": [
         {
             "name": "build-tests",
-            "displayName": "Build Aegis Tests",
+            "displayName": "Build Aegis Engine Tests",
             "configurePreset": "host-debug",
             "targets": [
-                "aegis_test"
+                "aegis_engine_test"
             ]
         },
         {
             "name": "build-lib",
-            "displayName": "Configure Library Interface",
+            "displayName": "Configure Aegis Engine Library Interface",
             "configurePreset": "host-no-tests"
         },
         {
@@ -65,7 +65,7 @@
     "testPresets": [
         {
             "name": "test-host",
-            "displayName": "Run Aegis Host Tests",
+            "displayName": "Run Aegis Engine Host Tests",
             "configurePreset": "host-debug",
             "output": {
                 "outputOnFailure": true
