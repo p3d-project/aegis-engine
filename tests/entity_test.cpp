@@ -1,7 +1,6 @@
 #include <aegis/aegis.hpp>
 
 #include <gtest/gtest.h>
-#include <type_traits>
 
 TEST(FixedPointTest, DeltaTimeIsPositive)
 {

@@ -9,31 +9,28 @@
         {
             "name": "host-debug",
             "displayName": "Aegis Engine Host Debug",
-            "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/out/build/host-debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "AEGIS_BUILD_TESTS": "ON"
+                "AEGIS_ENGINE_BUILD_TESTS": "ON"
             }
         },
         {
             "name": "host-release",
             "displayName": "Aegis Engine Host Release",
-            "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/out/build/host-release",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "AEGIS_BUILD_TESTS": "ON"
+                "AEGIS_ENGINE_BUILD_TESTS": "ON"
             }
         },
         {
             "name": "host-no-tests",
             "displayName": "Aegis Engine Host (Library Only)",
-            "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/out/build/host-no-tests",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "AEGIS_BUILD_TESTS": "OFF"
+                "AEGIS_ENGINE_BUILD_TESTS": "OFF"
             }
         },
         {
