@@ -88,9 +88,33 @@ class Entity
      * in sync when a component's lifecycle (Destroy + pool free) is being
      * managed externally. Prefer `RemoveComponent`/`Engine::DestroyComponent`
      * for normal use; this is a low-level building block for those.
+     *
+     * This also clears the component's `owner` pointer so the detached
+     * Component no longer reports a stale parent Entity after the removal.
      * @param c The component pointer to detach. No-op if not found.
      */
     void DetachComponent(Component* c);
+
+    /**
+     * @brief Returns the number of Components currently attached to this
+     *        Entity.
+     * @return Number of live attached Components.
+     */
+    std::size_t GetComponentCount() const
+    {
+        return components.size();
+    }
+
+    /**
+     * @brief Returns the Component stored at a given slot index.
+     * @param index Zero-based index into the attached-Component list.
+     * @return Pointer to the requested Component, or `nullptr` if the index
+     *         is out of range.
+     */
+    Component* GetComponentAt(std::size_t index) const
+    {
+        return index < components.size() ? components[index] : nullptr;
+    }
 
     /**
      * @brief Calls `Update(dt)` on every attached Component, per the Core
@@ -98,9 +122,6 @@ class Entity
      * @param dt Fixed-point delta time for this frame.
      */
     void Update(fixed_t dt);
-
-    /// Destroys (but does not free) all attached components.
-    void Destroy();
 
   private:
     EntityID entityID = 0;
@@ -149,7 +170,9 @@ inline void Entity::RemoveComponentByID(ComponentTypeID type)
     {
         if ((*it)->GetType() == type)
         {
-            (*it)->Destroy();
+            Component* component = *it;
+            component->Destroy();
+            component->SetOwner(nullptr);
             components.erase(it);
             return;
         }
@@ -170,6 +193,7 @@ inline void Entity::DetachComponent(Component* c)
     {
         if (*it == c)
         {
+            c->SetOwner(nullptr);
             components.erase(it);
             return;
         }
@@ -185,14 +209,5 @@ inline void Entity::Update(fixed_t dt)
             c->Update(dt);
         }
     }
-}
-
-inline void Entity::Destroy()
-{
-    for (Component* c : components)
-    {
-        c->Destroy();
-    }
-    components.clear();
 }
 } // namespace aegis
