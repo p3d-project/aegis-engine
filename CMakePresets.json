@@ -37,6 +37,16 @@
             "name": "default",
             "displayName": "Default (Host Debug)",
             "inherits": "host-debug"
+        },
+        {
+            "name": "release",
+            "displayName": "Default (Host Release)",
+            "inherits": "host-release"
+        },
+        {
+            "name": "debug",
+            "displayName": "Default (Host Debug)",
+            "inherits": "host-debug"
         }
     ],
     "buildPresets": [
@@ -49,7 +59,7 @@
             ]
         },
         {
-            "name": "build-lib",
+            "name": "build-release",
             "displayName": "Configure Aegis Engine Library Interface",
             "configurePreset": "host-no-tests"
         },
@@ -57,6 +67,16 @@
             "name": "default",
             "displayName": "Default (Build Tests)",
             "inherits": "build-tests"
+        },
+        {
+            "name": "debug",
+            "displayName": "Build Aegis Engine Debug",
+            "configurePreset": "host-debug"
+        },
+        {
+            "name": "release",
+            "displayName": "Build Aegis Engine Release",
+            "configurePreset": "host-release"
         }
     ],
     "testPresets": [
