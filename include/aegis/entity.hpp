@@ -97,7 +97,7 @@ class Entity
      *        Engine Loop's "Update Components" step.
      * @param dt Fixed-point delta time for this frame.
      */
-    void Update(fixed_t dt);
+    void Update(q20_12_t dt);
 
     /// Destroys (but does not free) all attached components.
     void Destroy();
@@ -176,7 +176,7 @@ inline void Entity::DetachComponent(Component* c)
     }
 }
 
-inline void Entity::Update(fixed_t dt)
+inline void Entity::Update(q20_12_t dt)
 {
     for (Component* c : components)
     {

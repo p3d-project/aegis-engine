@@ -38,7 +38,7 @@ class System
      * @brief Per-frame update, called from `Engine::Tick`.
      * @param dt Fixed-point delta time for this frame.
      */
-    virtual void Update(fixed_t dt) = 0;
+    virtual void Update(q20_12_t dt) = 0;
 
     /// Called once at shutdown.
     virtual void Shutdown() = 0;

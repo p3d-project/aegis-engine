@@ -294,7 +294,7 @@ class Engine
      *        Poll Input -> Update Systems -> Update Components -> Process Managers -> Compute.
      * @param dt Fixed-point delta time for this frame.
      */
-    void Tick(fixed_t dt)
+    void Tick(q20_12_t dt)
     {
         if (isPollingEnabled)
         {
