@@ -4,5 +4,6 @@
 #include <aegis/engine.hpp>
 #include <aegis/entity.hpp>
 #include <aegis/manager.hpp>
+#include <aegis/ndsTypes.hpp>
 #include <aegis/system.hpp>
 #include <aegis/types.hpp>
