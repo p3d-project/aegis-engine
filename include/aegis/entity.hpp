@@ -121,7 +121,7 @@ class Entity
      *        Engine Loop's "Update Components" step.
      * @param dt Fixed-point delta time for this frame.
      */
-    void Update(fixed_t dt);
+    void Update(q20_12_t dt);
 
   private:
     EntityID entityID = 0;
@@ -200,7 +200,7 @@ inline void Entity::DetachComponent(Component* c)
     }
 }
 
-inline void Entity::Update(fixed_t dt)
+inline void Entity::Update(q20_12_t dt)
 {
     for (Component* c : components)
     {

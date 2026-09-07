@@ -56,7 +56,7 @@ Aegis bundles its dependencies under /libs, which are the following:
 * Aegis relies entirely on ETL for its pre-allocated memory pools (`etl::pool`, `etl::vector`) and its global Publisher/Subscriber communication routing (`etl::message_bus`).
 
 2. **[FPM (Fixed Point Math)](https://github.com/MikeLankamp/fpm)**
-* Handles all engine-wide math (positions, deltas, timers) using Q16.16 signed fixed-point integers (`ae::fixed_t`), bypassing the performance penalty of software floating-point emulation on older ARM architecture.
+* Handles all engine-wide math (positions, deltas, timers) using Q20.12 signed fixed-point integers (`ae::q20_12_t`), bypassing the performance penalty of software floating-point emulation on older ARM architecture.
 
 
 ## Quick Start
@@ -82,7 +82,7 @@ public:
     ae::ComponentTypeID GetType() const override { return TYPE_ID; }
 
     void Init() override { hp = 100; }
-    void Update(ae::fixed_t dt) override {}
+    void Update(q20_12_t dt) override {}
     void Destroy() override {}
 
     // Broadcast an event to the global bus
@@ -152,7 +152,7 @@ int main()
     // Core Loop
     while (true) {
         // dt = 1/60th of a second
-        engine.Tick(ae::fixed_t(1) / 60);
+        engine.Tick(ae::q20_12_t(1) / 60);
     }
 
     engine.ShutdownAll();

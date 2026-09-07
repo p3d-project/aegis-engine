@@ -49,7 +49,7 @@ class Component
      * @brief Per-frame update, called from `Entity::Update`.
      * @param dt Fixed-point delta time for this frame.
      */
-    virtual void Update(fixed_t dt) = 0;
+    virtual void Update(q20_12_t dt) = 0;
 
     /// Deallocates memory, & resets state. Called when the component is destroyed
     virtual void Destroy() = 0;

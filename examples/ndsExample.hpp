@@ -126,14 +126,14 @@ namespace Payload
 struct RenderMesh
 {
     std::int32_t modelID;
-    ae::fixed_t matrix[16];
+    ae::q20_12_t matrix[16];
 };
 
 struct CollisionHitbox
 {
-    ae::fixed_t radius;
-    ae::fixed_t x;
-    ae::fixed_t y;
+    ae::q20_12_t radius;
+    ae::q20_12_t x;
+    ae::q20_12_t y;
 };
 } // namespace Payload
 
@@ -195,7 +195,7 @@ class HealthComponent : public ae::ComponentRouter<HealthComponent, Event::State
     {
         currentHP = 100;
     }
-    void Update(ae::fixed_t /*dt*/) override
+    void Update(ae::q20_12_t /*dt*/) override
     {
     }
     void Destroy() override
@@ -274,7 +274,7 @@ class MeshComponent : public ae::Component
     void Init() override
     {
     }
-    void Update(ae::fixed_t /*dt*/) override
+    void Update(ae::q20_12_t /*dt*/) override
     {
         SubmitToManager();
     }
@@ -328,7 +328,7 @@ class BattleSystem : public ae::SystemRouter<BattleSystem, Event::Damage, Event:
      *        applies the queued damage rule otherwise, then broadcasts
      *        the result.
      */
-    void Update(ae::fixed_t /*dt*/) override
+    void Update(ae::q20_12_t /*dt*/) override
     {
         if (!isActive)
         {
@@ -452,7 +452,8 @@ int ndsExampleMain()
 
     // Fixed-point delta time, expressed in seconds (~16.67ms at 60 FPS).
     // On real NDS hardware this is a constant tied to VBlank, not measured.
-    const ae::fixed_t dt = ae::fixed_t(1) / 60;
+    // In persona 3 dual, MathManager's division function is used for divisions
+    const ae::q20_12_t dt = ae::q20_12_t{1} / 60;
 
     // 6. The main game loop.
     bool isRunning = true;
@@ -521,7 +522,7 @@ void ndsExampleTest()
 
     iprintf("Initial HP: %d\n", hc->GetCurrentHP());
     hc->TakeDamage(15, 0);
-    engine.Tick(ae::fixed_t(1) / 60);
+    engine.Tick(ae::q20_12_t(1) / 60);
     iprintf("Final HP: %d\n", hc->GetCurrentHP());
 
     engine.DestroyComponent(hc);
