@@ -26,6 +26,11 @@ namespace aegis
 // Core type aliases
 // =============================================================================
 
+/**
+ * @brief Engine-wide General purpose fixed-point type (Q20.12 signed).
+ */
+using q20_12_t = fpm::fixed<std::int32_t, std::int64_t, 12>;
+
 /// Unique identifier for an Entity instance.
 using EntityID = std::uint32_t;
 

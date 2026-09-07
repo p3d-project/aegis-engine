@@ -11,7 +11,6 @@
  */
 
 #include <aegis/component.hpp>
-#include <aegis/ndsTypes.hpp>
 #include <aegis/types.hpp>
 #include <cassert>
 #include <etl/vector.h>

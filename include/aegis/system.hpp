@@ -10,7 +10,6 @@
  * @note Mirrors `component.hpp`'s `ComponentRouter` design — see its
  *       documentation for the shared CRTP contract.
  */
-#include <aegis/ndsTypes.hpp>
 #include <aegis/types.hpp>
 
 #include <etl/message_router.h>

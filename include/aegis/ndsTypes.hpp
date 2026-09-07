@@ -14,13 +14,6 @@ namespace aegis
 {
 
 /**
- * @brief Engine-wide General purpose fixed-point type (Q20.12 signed).
- *
- * Replaces floats since NDS lacks an fpu.
- */
-using q20_12_t = fpm::fixed<std::int32_t, std::int64_t, 12>;
-
-/**
  * @brief vertex coordinate type (Q4.12 signed), matches libnds v16.
  *
  * Used by trig_lut.h for sinLerp/cosLerp/asinLerp/acosLerp's ratio.
