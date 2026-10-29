@@ -15,6 +15,17 @@ See core/README.md for a quick overview on how the game engine should work.
 - Built for the team, with the team
 - No AI, pure skill.
 - No superficial design design document. Pure coding, architecture, documentation, notes (in md files) and PR reviews will be the basis of how we develop this game engine.
+---
+- Minimized RAM usage. Minimized vtables. Fast computations.
+- Use ETL, FPM libraries to help achieve this
+- Doxygen-based documentation throughout the codebase, all living in the interface/hpp files (and not the implementations)
+- Entire flow is data-driven first. Want to make a new Entity on creation? Define it in data. Want to make a new Component? Define it in data. Want to make a new Scene? Define it in data. Want to make a UI? Define it in data. EVERYTHING as much as possible is defined in data. (somehow work out how to get fpm working with this).  -> We need to somehow make this all work, and make it NOT a headache to make systems.
+- Follow industry standard practices and approaches
+- Proper 2D, and proper 3D game engine in one. 
+
+## Future
+- Real other HW support through our HAL layer
+- Networking support (multiplayer, download play, etc.)
 
 ## TODO
 - [ ] Deprecate aegis engine v1.0.0
