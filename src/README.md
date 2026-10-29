@@ -19,4 +19,10 @@ See core/README.md for a quick overview on how the game engine should work.
 ## TODO
 - [ ] Deprecate aegis engine v1.0.0
 
-
+## What I'm having a hard time with
+- How do we do the HAL layer? Seperate "Device" files?? (what managers in 1.0.0 do). Just a namespace???
+- How do we actually make the data-driven workflow? I'm having a really hard time imagining this process
+    - Reflection? This seems performance heavy. Generate on compile seems better
+    - Whats the model (schema) look like?
+    - Whats the data look like?
+- Help with optimizing for embedded platforms/Nintendo DS
