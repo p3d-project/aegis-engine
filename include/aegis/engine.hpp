@@ -347,7 +347,7 @@ class Engine
 
         for (System* s : systems)
         {
-            if (s->IsActive())
+            if (s->isActive())
             {
                 s->update(dt);
             }

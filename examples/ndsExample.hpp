@@ -67,10 +67,10 @@ enum : etl::message_id_t
 } // namespace EventID
 
 /**
- * @brief POD messages broadcast over `engineBus` via `BroadcastEvent(...)`.
+ * @brief POD messages broadcast over `engineBus` via `broadcastEvent(...)`.
  *
- * A "Start[SystemName]System" event (see StartBattleSystem` below) is
- * reserved for Component -> System activation.
+ *  A "Start[SystemName]System" event (see StartBattleSystem` below) is
+ *  reserved for Component -> System activation.
  *
  * @note These are NOT aggregates (they inherit from `etl::message<ID>`, a
  *       polymorphic base), so brace-init like `Event::Damage{15, 0}` will
@@ -104,13 +104,13 @@ struct State : public etl::message<EventID::ChangeState>
 };
 
 /**
- * @brief Component -> System: wakes `BattleSystem` up for this frame.
- *
- * Empty payload. This event exists purely to flip `BattleSystem`'s
- * `isActive` flag on, per the HLD's "Update Frequency" rule that
- * Systems "exit update early if false" and "toggle their own flag
- * based on events received from pub/sub".
- */
+     * @brief Component -> System: wakes `BattleSystem` up for this frame.
+     *
+     * Empty payload. This event exists purely to flip `BattleSystem`'s
+     * `active` flag on, per the HLD's "Update Frequency" rule that
+     * Systems "exit update early if false" and "toggle their own flag
+     * based on events received from pub/sub".
+     */
 struct StartBattleSystem : public etl::message<EventID::StartBattleSystem>
 {
 };
@@ -195,7 +195,7 @@ class HealthComponent : public ae::ComponentRouter<HealthComponent, Event::State
     {
         currentHP = 100;
     }
-    void update(ae::fixed_t /*dt*/) override
+    void update(ae::q20_12_t /*dt*/) override
     {
     }
     void destroy() override
@@ -274,7 +274,7 @@ class MeshComponent : public ae::Component
     void init() override
     {
     }
-    void update(ae::fixed_t /*dt*/) override
+    void update(ae::q20_12_t /*dt*/) override
     {
         submitToManager();
     }
@@ -308,7 +308,7 @@ constexpr etl::message_router_id_t kBattleSystemRouterID = 0;
  * @brief Example System: applies battle rules to incoming damage events.
  *
  * - **Receives**: `on_receive(const Event::StartBattleSystem&)` flips
- *   `isActive` on; `on_receive(const Event::Damage&)` queues a rule to run.
+ *   `active` on; `on_receive(const Event::Damage&)` queues a rule to run.
  * - **Sends**: after `update()` processes a queued hit, it broadcasts
  *   `Event::State` so components (e.g. `HealthComponent`) can react.
  */
@@ -324,13 +324,13 @@ class BattleSystem : public ae::SystemRouter<BattleSystem, Event::Damage, Event:
     }
 
     /**
-     * @brief Per-frame update. Exits early if `isActive` is false, and
+     * @brief Per-frame update. Exits early if `active` is false, and
      *        applies the queued damage rule otherwise, then broadcasts
      *        the result.
      */
-    void update(ae::fixed_t /*dt*/) override
+    void update(ae::q20_12_t /*dt*/) override
     {
-        if (!isActive)
+        if (!active)
         {
             return;
         }
@@ -340,7 +340,7 @@ class BattleSystem : public ae::SystemRouter<BattleSystem, Event::Damage, Event:
         const std::int32_t appliedAmount = pendingDamageAmount;
         const std::int32_t resultingStateID = appliedAmount > 0 ? 1 /* "Hurt" */ : 0 /* "Idle" */;
 
-        ENGINE_TRACE("[BattleSystem] update: applying rule -> amount=%ld, newState=%ld\n",
+        ENGINE_TRACE("[BattleSystem] Update: applying rule -> amount=%ld, newState=%ld\n",
                      (long)appliedAmount,
                      (long)resultingStateID);
 
@@ -522,7 +522,7 @@ void ndsExampleTest()
 
     iprintf("Initial HP: %d\n", hc->getCurrentHP());
     hc->takeDamage(15, 0);
-    engine.tick(ae::fixed_t(1) / 60);
+    engine.tick(ae::q20_12_t(1) / 60);
     iprintf("Final HP: %d\n", hc->getCurrentHP());
 
     engine.destroyComponent(hc);

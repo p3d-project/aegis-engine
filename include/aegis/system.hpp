@@ -58,9 +58,9 @@ class System
      *
      * @return true if the system is active, false otherwise.
      */
-    bool IsActive()
+    bool isActive()
     {
-        return isActive;
+        return active;
     }
 
   protected:
@@ -72,7 +72,7 @@ class System
      *        received from `engineBus` (e.g. a
      *        "Start[SystemName]System" event).
      */
-    bool isActive = false;
+    bool active = false;
 };
 
 /**

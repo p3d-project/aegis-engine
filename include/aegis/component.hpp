@@ -62,9 +62,9 @@ class Component
      *
      * @return true if the component is active, false otherwise.
      */
-    bool IsActive()
+    bool isActive()
     {
-        return isActive;
+        return active;
     }
 
     /// @return The Entity this component is attached to, or `nullptr`.
@@ -109,7 +109,7 @@ class Component
      * @brief Whether this component's `update` should run its logic this
      *        frame. Toggled by concrete subclasses.
      */
-    bool isActive = false;
+    bool active = false;
 
     /// The Entity that owns this component (set via `setOwner`).
     Entity* owner = nullptr;

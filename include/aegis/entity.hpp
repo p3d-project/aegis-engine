@@ -204,7 +204,7 @@ inline void Entity::update(q20_12_t dt)
 {
     for (Component* c : components)
     {
-        if (c->IsActive())
+        if (c->isActive())
         {
             c->update(dt);
         }
