@@ -4,3 +4,6 @@
 [submodule "libs/etl"]
 	path = libs/etl
 	url = https://github.com/ETLCPP/etl.git
+[submodule "libs/googletest"]
+	path = libs/googletest
+	url = https://github.com/google/googletest

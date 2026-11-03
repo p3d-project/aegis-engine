@@ -9,7 +9,7 @@
  *
  * @note `Component` itself has zero knowledge of message types; only
  *       concrete subclasses (via `ComponentRouter`) declare which events
- *       they subscribe to. See `types.hpp` for `BroadcastEvent`, the
+ *       they subscribe to. See `types.hpp` for `broadcastEvent`, the
  *       corresponding "send" half of Pub/Sub.
  */
 
@@ -49,9 +49,9 @@ class Component
      * @brief Per-frame update, called from `Entity::update`.
      * @param dt Fixed-point delta time for this frame.
      */
-    virtual void update(fixed_t dt) = 0;
+    virtual void update(q20_12_t dt) = 0;
 
-    /// Called when the component is detached/destroyed.
+    /// Deallocates memory, & resets state. Called when the component is destroyed
     virtual void destroy() = 0;
 
     /// @return This component's game-defined type identifier.
@@ -62,9 +62,9 @@ class Component
      *
      * @return true if the component is active, false otherwise.
      */
-    bool isActive()
+    bool IsActive()
     {
-        return active;
+        return isActive;
     }
 
     /// @return The Entity this component is attached to, or `nullptr`.
@@ -109,7 +109,7 @@ class Component
      * @brief Whether this component's `update` should run its logic this
      *        frame. Toggled by concrete subclasses.
      */
-    bool active = false;
+    bool isActive = false;
 
     /// The Entity that owns this component (set via `setOwner`).
     Entity* owner = nullptr;

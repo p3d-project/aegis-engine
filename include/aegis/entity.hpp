@@ -4,7 +4,7 @@
  * @file entity.hpp
  * @brief Aegis Engine — `Entity`: an identity plus a fixed-capacity,
  *        non-owning list of attached Components, with typed
- *        (`GetComponent<T>`) and untyped (`GetComponentByID`) lookup.
+ *        (`getComponent<T>`) and untyped (`getComponentByID`) lookup.
  *
  * @note Entities do not own Component memory — see `Engine`'s pools.
  * @note Requires C++17.
@@ -45,7 +45,7 @@ class Entity
 
     /**
      * @brief Registers an already-constructed Component with this entity
-     *        and calls its `Init()`.
+     *        and calls its `init()`.
      * @param c Pointer to a Component allocated by `Engine`.
      */
     void addComponent(Component* c);
@@ -65,11 +65,11 @@ class Entity
 
     /**
      * @brief Detaches the Component of the given type, calling its
-     *        `Destroy()` first.
-     * @note Does NOT free pool memory (see `Engine::DestroyComponent`),
+     *        `destroy()` first.
+     * @note Does NOT free pool memory (see `Engine::destroyComponent`),
      *       which is the recommended way to fully retire a component (it
      *       detaches from the owner, destroys, and frees the pool slot in
-     *       one call without double-invoking `Destroy()`).
+     *       one call without double-invoking `destroy()`).
      * @param type The `ComponentTypeID` to remove.
      */
     void removeComponentByID(ComponentTypeID type);
@@ -82,25 +82,46 @@ class Entity
 
     /**
      * @brief Removes a component pointer from this entity's internal list
-     *        WITHOUT calling `Destroy()` on it.
+     *        WITHOUT calling `destroy()` on it.
      *
-     * Used by `Engine::DestroyComponent` to keep an entity's component list
+     * Used by `Engine::destroyComponent` to keep an entity's component list
      * in sync when a component's lifecycle (Destroy + pool free) is being
-     * managed externally. Prefer `RemoveComponent`/`Engine::DestroyComponent`
+     * managed externally. Prefer `removeComponent`/`Engine::destroyComponent`
      * for normal use; this is a low-level building block for those.
+     *
+     * This also clears the component's `owner` pointer so the detached
+     * Component no longer reports a stale parent Entity after the removal.
      * @param c The component pointer to detach. No-op if not found.
      */
     void detachComponent(Component* c);
 
     /**
-     * @brief Calls `Update(dt)` on every attached Component, per the Core
+     * @brief Returns the number of Components currently attached to this
+     *        Entity.
+     * @return Number of live attached Components.
+     */
+    std::size_t getComponentCount() const
+    {
+        return components.size();
+    }
+
+    /**
+     * @brief Returns the Component stored at a given slot index.
+     * @param index Zero-based index into the attached-Component list.
+     * @return Pointer to the requested Component, or `nullptr` if the index
+     *         is out of range.
+     */
+    Component* getComponentAt(std::size_t index) const
+    {
+        return index < components.size() ? components[index] : nullptr;
+    }
+
+    /**
+     * @brief Calls `update(dt)` on every attached Component, per the Core
      *        Engine Loop's "Update Components" step.
      * @param dt Fixed-point delta time for this frame.
      */
-    void update(fixed_t dt);
-
-    /// Destroys (but does not free) all attached components.
-    void destroy();
+    void update(q20_12_t dt);
 
   private:
     EntityID entityID = 0;
@@ -140,7 +161,7 @@ template <typename T> inline T* Entity::getComponent() const
     static_assert(detail::has_type_id<T>::value,
                   "\n\n[AE ERROR]: Component is missing its TYPE_ID\n"
                   "You must define: static constexpr ComponentTypeID TYPE_ID = ...\n");
-    return static_cast<T*>(GetComponentByID(T::TYPE_ID));
+    return static_cast<T*>(getComponentByID(T::TYPE_ID));
 }
 
 inline void Entity::removeComponentByID(ComponentTypeID type)
@@ -149,7 +170,9 @@ inline void Entity::removeComponentByID(ComponentTypeID type)
     {
         if ((*it)->getType() == type)
         {
-            (*it)->destroy();
+            Component* component = *it;
+            component->destroy();
+            component->setOwner(nullptr);
             components.erase(it);
             return;
         }
@@ -170,29 +193,21 @@ inline void Entity::detachComponent(Component* c)
     {
         if (*it == c)
         {
+            c->setOwner(nullptr);
             components.erase(it);
             return;
         }
     }
 }
 
-inline void Entity::update(fixed_t dt)
+inline void Entity::update(q20_12_t dt)
 {
     for (Component* c : components)
     {
-        if (c->isActive())
+        if (c->IsActive())
         {
             c->update(dt);
         }
     }
-}
-
-inline void Entity::destroy()
-{
-    for (Component* c : components)
-    {
-        c->destroy();
-    }
-    components.clear();
 }
 } // namespace aegis

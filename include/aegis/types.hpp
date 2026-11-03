@@ -2,7 +2,7 @@
 
 /**
  * @file types.hpp
- * @brief Aegis Engine — core type aliases, fixed-point math type, default
+ * @brief Aegis Engine — core type aliases, default
  *        engine capacity limits, the global Pub/Sub message bus, and the
  *        small CRTP/SFINAE helpers (`Singleton`, `has_type_id`) shared by
  *        every other Aegis header.
@@ -26,16 +26,13 @@ namespace aegis
 // Core type aliases
 // =============================================================================
 
+/**
+ * @brief Engine-wide General purpose fixed-point type (Q20.12 signed).
+ */
+using q20_12_t = fpm::fixed<std::int32_t, std::int64_t, 12>;
+
 /// Unique identifier for an Entity instance.
 using EntityID = std::uint32_t;
-
-/**
- * @brief Engine-wide fixed-point type (Q16.16 signed).
- *
- * Assume no FPU, so all game-logic math (positions, damage rolls, timers,
- * delta-time, etc.) must go through this type instead of float/double.
- */
-using fixed_t = fpm::fixed<std::int32_t, std::int64_t, 16>;
 
 /**
  * @brief Generic identifier for a concrete Component's "type".
@@ -43,7 +40,7 @@ using fixed_t = fpm::fixed<std::int32_t, std::int64_t, 16>;
  * The engine only ever stores/compares this as an opaque integer; it has no
  * knowledge of what the values mean. Game code defines its own enum (e.g.
  * `enum class ComponentType : ComponentTypeID { Mesh, Hitbox, Health, ... }`)
- * and returns the underlying value from `Component::GetType()`.
+ * and returns the underlying value from `Component::getType()`.
  */
 using ComponentTypeID = std::uint16_t;
 
@@ -91,7 +88,7 @@ inline etl::message_bus<EngineLimits::MAX_MESSAGE_ROUTERS> engineBus;
  * "receive". Call it from anywhere a Component or System wants to
  * broadcast, e.g.:
  * @code
- * BroadcastEvent(Event::Damage{15, 0});
+ * broadcastEvent(Event::Damage{15, 0});
  * @endcode
  *
  * @tparam TMessage An `etl::message<ID>`-derived event type (see the

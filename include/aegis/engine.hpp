@@ -4,8 +4,8 @@
  * @file engine.hpp
  * @brief Aegis Engine — `Engine<...>`: owns the Entity/Component pools,
  *        the System/Manager registry, and drives the Core Engine Loop
- *        (poll input -> update systems -> update components -> process
- *        managers -> compute).
+ *        (Poll Input -> Update Systems -> Update Components -> Process
+ *        Managers -> Compute).
  *
  * @note All pool/registry capacities are template parameters, not
  *       hardcoded constants — size `Engine` per project/platform via
@@ -45,9 +45,9 @@ namespace aegis
  * @endcode
  *
  * @tparam ComponentBlockSize  Byte size of the largest concrete Component
- *                           type the game will allocate (`sizeof(T)`).
+ *                             type the game will allocate (`sizeof(T)`).
  * @tparam ComponentBlockAlign Alignment of the largest concrete Component
- *                           type the game will allocate (`alignof(T)`).
+ *                             type the game will allocate (`alignof(T)`).
  * @tparam MaxEntities         Max simultaneous Entities.
  * @tparam MaxComponents       Max simultaneous Components (all entities combined).
  * @tparam MaxSystems          Max registered Systems.
@@ -83,8 +83,11 @@ class Engine
     }
 
     /**
-     * @brief Destroys all of the entity's components and returns the
-     *        entity itself to the pool.
+     * @brief Fully retires an Entity and all of its attached Components.
+     *
+     * This tears down each Component in-place, detaches it from the owner,
+     * disconnects any message routing, returns its memory to the shared
+     * component pool, and finally releases the Entity back to the entity pool.
      * @param entity Entity previously returned by `createEntity`.
      */
     void destroyEntity(Entity* entity)
@@ -94,7 +97,25 @@ class Engine
             return;
         }
 
-        entity->destroy();
+        while (entity->getComponentCount() > 0)
+        {
+            Component* component = entity->getComponentAt(0);
+            if (component == nullptr)
+            {
+                break;
+            }
+
+            component->destroy();
+            entity->detachComponent(component);
+            component->setOwner(nullptr);
+
+            if (etl::imessage_router* router = component->asMessageRouter())
+            {
+                engineBus.unsubscribe(*router);
+            }
+
+            componentPool.destroy(component);
+        }
 
         for (auto it = activeEntities.begin(); it != activeEntities.end(); ++it)
         {
@@ -106,6 +127,25 @@ class Engine
         }
 
         entityPool.destroy(entity);
+    }
+
+    /**
+     * @brief Returns how many Entities are currently active in the engine.
+     * @return Number of live Entities tracked by the engine.
+     */
+    std::size_t getActiveEntityCount() const
+    {
+        return activeEntities.size();
+    }
+
+    /**
+     * @brief Returns how many Components are currently allocated from the
+     *        shared component pool.
+     * @return Number of live Components currently owned by the engine.
+     */
+    std::size_t getActiveComponentCount() const
+    {
+        return componentPool.available() == 0 ? MaxComponents : MaxComponents - componentPool.available();
     }
 
     // --- Component lifecycle ---------------------------------------------
@@ -156,6 +196,8 @@ class Engine
         {
             owner->detachComponent(component);
         }
+
+        component->setOwner(nullptr);
 
         if (etl::imessage_router* router = component->asMessageRouter())
         {
@@ -291,10 +333,10 @@ class Engine
 
     /**
      * @brief Runs one iteration of the Core Engine Loop:
-     *        poll input -> update systems -> update components -> process managers -> compute.
+     *        Poll Input -> Update Systems -> Update Components -> Process Managers -> Compute.
      * @param dt Fixed-point delta time for this frame.
      */
-    void tick(fixed_t dt)
+    void tick(q20_12_t dt)
     {
         if (isPollingEnabled)
         {
@@ -305,7 +347,7 @@ class Engine
 
         for (System* s : systems)
         {
-            if (s->isActive())
+            if (s->IsActive())
             {
                 s->update(dt);
             }

@@ -67,10 +67,10 @@ enum : etl::message_id_t
 } // namespace EventID
 
 /**
- * @brief POD messages broadcast over `engineBus` via `BroadcastEvent(...)`.
+ * @brief POD messages broadcast over `engineBus` via `broadcastEvent(...)`.
  *
- * A "Start[SystemName]System" event (see StartBattleSystem` below) is
- * reserved for Component -> System activation.
+ *  A "Start[SystemName]System" event (see StartBattleSystem` below) is
+ *  reserved for Component -> System activation.
  *
  * @note These are NOT aggregates (they inherit from `etl::message<ID>`, a
  *       polymorphic base), so brace-init like `Event::Damage{15, 0}` will
@@ -104,13 +104,13 @@ struct State : public etl::message<EventID::ChangeState>
 };
 
 /**
- * @brief Component -> System: wakes `BattleSystem` up for this frame.
- *
- * Empty payload. This event exists purely to flip `BattleSystem`'s
- * `isActive` flag on, per the HLD's "Update Frequency" rule that
- * Systems "exit update early if false" and "toggle their own flag
- * based on events received from pub/sub".
- */
+     * @brief Component -> System: wakes `BattleSystem` up for this frame.
+     *
+     * Empty payload. This event exists purely to flip `BattleSystem`'s
+     * `isActive` flag on, per the HLD's "Update Frequency" rule that
+     * Systems "exit update early if false" and "toggle their own flag
+     * based on events received from pub/sub".
+     */
 struct StartBattleSystem : public etl::message<EventID::StartBattleSystem>
 {
 };
@@ -126,14 +126,14 @@ namespace Payload
 struct RenderMesh
 {
     std::int32_t modelID;
-    ae::fixed_t matrix[16];
+    ae::q20_12_t matrix[16];
 };
 
 struct CollisionHitbox
 {
-    ae::fixed_t radius;
-    ae::fixed_t x;
-    ae::fixed_t y;
+    ae::q20_12_t radius;
+    ae::q20_12_t x;
+    ae::q20_12_t y;
 };
 } // namespace Payload
 
@@ -195,7 +195,7 @@ class HealthComponent : public ae::ComponentRouter<HealthComponent, Event::State
     {
         currentHP = 100;
     }
-    void update(ae::fixed_t /*dt*/) override
+    void update(ae::q20_12_t /*dt*/) override
     {
     }
     void destroy() override
@@ -274,7 +274,7 @@ class MeshComponent : public ae::Component
     void init() override
     {
     }
-    void update(ae::fixed_t /*dt*/) override
+    void update(ae::q20_12_t /*dt*/) override
     {
         submitToManager();
     }
@@ -328,7 +328,7 @@ class BattleSystem : public ae::SystemRouter<BattleSystem, Event::Damage, Event:
      *        applies the queued damage rule otherwise, then broadcasts
      *        the result.
      */
-    void update(ae::fixed_t /*dt*/) override
+    void update(ae::q20_12_t /*dt*/) override
     {
         if (!isActive)
         {
@@ -340,7 +340,7 @@ class BattleSystem : public ae::SystemRouter<BattleSystem, Event::Damage, Event:
         const std::int32_t appliedAmount = pendingDamageAmount;
         const std::int32_t resultingStateID = appliedAmount > 0 ? 1 /* "Hurt" */ : 0 /* "Idle" */;
 
-        ENGINE_TRACE("[BattleSystem] update: applying rule -> amount=%ld, newState=%ld\n",
+        ENGINE_TRACE("[BattleSystem] Update: applying rule -> amount=%ld, newState=%ld\n",
                      (long)appliedAmount,
                      (long)resultingStateID);
 
@@ -351,14 +351,14 @@ class BattleSystem : public ae::SystemRouter<BattleSystem, Event::Damage, Event:
         ae::broadcastEvent(msg);
 
         pendingDamageAmount = 0;
-        active = false; // done processing; wait for the next StartBattleSystem
+        isActive = false; // done processing; wait for the next StartBattleSystem
     }
 
     /// Component -> System: activation event, per the HLD's reserved
     /// "Start[SystemName]System" naming convention.
     void on_receive(const Event::StartBattleSystem&)
     {
-        active = true;
+        isActive = true;
         ENGINE_TRACE("[BattleSystem] <- StartBattleSystem (isActive=true)\n");
     }
 
@@ -452,7 +452,8 @@ int ndsExampleMain()
 
     // Fixed-point delta time, expressed in seconds (~16.67ms at 60 FPS).
     // On real NDS hardware this is a constant tied to VBlank, not measured.
-    const ae::fixed_t dt = ae::fixed_t(1) / 60;
+    // In persona 3 dual, MathManager's division function is used for divisions
+    const ae::q20_12_t dt = ae::q20_12_t{1} / 60;
 
     // 6. The main game loop.
     bool isRunning = true;
@@ -521,7 +522,7 @@ void ndsExampleTest()
 
     iprintf("Initial HP: %d\n", hc->getCurrentHP());
     hc->takeDamage(15, 0);
-    engine.tick(ae::fixed_t(1) / 60);
+    engine.tick(ae::q20_12_t(1) / 60);
     iprintf("Final HP: %d\n", hc->getCurrentHP());
 
     engine.destroyComponent(hc);
