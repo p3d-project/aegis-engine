@@ -33,22 +33,22 @@ class System
     virtual ~System() = default;
 
     /// Called once at startup.
-    virtual void Init() = 0;
+    virtual void init() = 0;
 
     /**
-     * @brief Per-frame update, called from `Engine::Tick`.
+     * @brief Per-frame update, called from `Engine::tick`.
      * @param dt Fixed-point delta time for this frame.
      */
-    virtual void Update(q20_12_t dt) = 0;
+    virtual void update(q20_12_t dt) = 0;
 
     /// Called once at shutdown.
-    virtual void Shutdown() = 0;
+    virtual void shutdown() = 0;
 
     /**
      * @brief Returns this system as an `etl::imessage_router` if it
      *        participates in Pub/Sub, or `nullptr` if it doesn't.
      */
-    virtual etl::imessage_router* AsMessageRouter()
+    virtual etl::imessage_router* asMessageRouter()
     {
         return nullptr;
     }
@@ -58,21 +58,21 @@ class System
      *
      * @return true if the system is active, false otherwise.
      */
-    bool IsActive()
+    bool isActive()
     {
-        return isActive;
+        return active;
     }
 
   protected:
     System() = default;
 
     /**
-     * @brief Whether this system's `Update` should run its logic this
+     * @brief Whether this system's `update` should run its logic this
      *        frame. Toggled by concrete subclasses in response to events
      *        received from `engineBus` (e.g. a
      *        "Start[SystemName]System" event).
      */
-    bool isActive = false;
+    bool active = false;
 };
 
 /**
@@ -88,7 +88,7 @@ class System
  *     BattleSystem() : SystemRouter(kBattleSystemRouterID) {}
  *     void on_receive(const Event::Damage& msg) { ... }
  *     void on_receive_unknown(const etl::imessage&) {}
- *     // ... Init/Update/Shutdown ...
+ *     // ... init/update/shutdown ...
  * };
  * @endcode
  *
@@ -104,7 +104,7 @@ class SystemRouter : public System, public etl::message_router<TDerived, TMessag
     {
     }
 
-    etl::imessage_router* AsMessageRouter() override
+    etl::imessage_router* asMessageRouter() override
     {
         return static_cast<etl::message_router<TDerived, TMessageTypes...>*>(this);
     }

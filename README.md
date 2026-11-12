@@ -79,17 +79,17 @@ class HealthComponent : public ae::ComponentRouter<HealthComponent, Event::Damag
 public:
     // Required compile-time ID
     static constexpr ae::ComponentTypeID TYPE_ID = 1;
-    ae::ComponentTypeID GetType() const override { return TYPE_ID; }
+    ae::ComponentTypeID getType() const override { return TYPE_ID; }
 
-    void Init() override { hp = 100; }
-    void Update(q20_12_t dt) override {}
-    void Destroy() override {}
+    void init() override { hp = 100; }
+    void update(q20_12_t dt) override {}
+    void destroy() override {}
 
     // Broadcast an event to the global bus
-    void TakeDamage(int amount) {
+    void takeDamage(int amount) {
         Event::Damage msg;
         msg.amount = amount;
-        ae::BroadcastEvent(msg);
+        ae::broadcastEvent(msg);
     }
 
     // React to events from Systems
@@ -101,7 +101,7 @@ public:
     void on_receive_unknown(const etl::imessage&) {}
 
 protected:
-    void SubmitToManager() override {}
+    void submitToManager() override {}
 
 private:
     int hp;
@@ -123,11 +123,11 @@ using GameEngine = ae::Engine<
 >;
 
 // Implement hardware-specific wrappers
-void NDS_PollInput() {
+void ndsPollInput() {
     // scanKeys();
 }
 
-void NDS_Compute() {
+void ndsCompute() {
     // swiWaitForVBlank();
 }
 
@@ -136,26 +136,26 @@ int main()
     GameEngine engine;
 
     // Inject hardware hooks and register singletons
-    engine.SetPollInputCallback(&NDS_PollInput);
-    engine.SetComputeCallback(&NDS_Compute);
-    engine.SetPollingEnabled(true);
-    engine.SetComputeEnabled(true);
+    engine.setPollInputCallback(&ndsPollInput);
+    engine.setComputeCallback(&ndsCompute);
+    engine.setPollingEnabled(true);
+    engine.setComputeEnabled(true);
 
-    engine.InitAll();
+    engine.initAll();
 
     // Spawn entities and attach components
-    ae::Entity* player = engine.CreateEntity();
+    ae::Entity* player = engine.createEntity();
     if (player != nullptr) {
-        player->AddComponent(engine.CreateComponent<HealthComponent>());
+        player->addComponent(engine.createComponent<HealthComponent>());
     }
 
     // Core Loop
     while (true) {
         // dt = 1/60th of a second
-        engine.Tick(ae::q20_12_t(1) / 60);
+        engine.tick(ae::q20_12_t(1) / 60);
     }
 
-    engine.ShutdownAll();
+    engine.shutdownAll();
     return 0;
 }
 

@@ -40,7 +40,7 @@ using EntityID = std::uint32_t;
  * The engine only ever stores/compares this as an opaque integer; it has no
  * knowledge of what the values mean. Game code defines its own enum (e.g.
  * `enum class ComponentType : ComponentTypeID { Mesh, Hitbox, Health, ... }`)
- * and returns the underlying value from `Component::GetType()`.
+ * and returns the underlying value from `Component::getType()`.
  */
 using ComponentTypeID = std::uint16_t;
 
@@ -88,14 +88,14 @@ inline etl::message_bus<EngineLimits::MAX_MESSAGE_ROUTERS> engineBus;
  * "receive". Call it from anywhere a Component or System wants to
  * broadcast, e.g.:
  * @code
- * BroadcastEvent(Event::Damage{15, 0});
+ * broadcastEvent(Event::Damage{15, 0});
  * @endcode
  *
  * @tparam TMessage An `etl::message<ID>`-derived event type (see the
  *                   `Event` namespace convention in the companion example).
  * @param msg The event instance to broadcast.
  */
-template <typename TMessage> inline void BroadcastEvent(const TMessage& msg)
+template <typename TMessage> inline void broadcastEvent(const TMessage& msg)
 {
     engineBus.receive(msg);
 }
@@ -110,7 +110,7 @@ namespace detail
  * (see `SystemRouter`), since a monotonic counter isn't needed for a
  * type that only ever has one instance.
  */
-inline etl::message_router_id_t NextComponentRouterID()
+inline etl::message_router_id_t nextComponentRouterID()
 {
     static etl::message_router_id_t next = 0;
     return next++;
@@ -151,7 +151,7 @@ template <typename TDerived> class Singleton
      * @brief Returns the single instance of TDerived, constructing it on
      *        first use.
      */
-    static TDerived& GetInstance()
+    static TDerived& getInstance()
     {
         static TDerived instance;
         return instance;

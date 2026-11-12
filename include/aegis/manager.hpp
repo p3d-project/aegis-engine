@@ -7,7 +7,7 @@
  *        subsystems (the DOD side of the engine).
  *
  * @note Managers are the only code permitted to call platform/hardware
- *       functions directly — see `Component::SubmitToManager` for how
+ *       functions directly — see `Component::submitToManager` for how
  *       Components hand data to them (one-way, not Pub/Sub).
  */
 
@@ -27,9 +27,9 @@ namespace aegis
  *
  * @note Manager intentionally does NOT derive from `etl::message_router`.
  *       Components submit to Managers via direct one-way calls, not
- *       Pub/Sub (see `Component::SubmitToManager`). Concrete Managers
+ *       Pub/Sub (see `Component::submitToManager`). Concrete Managers
  *       (e.g. `RenderManager`) each declare their own
- *       `SubmitData(const Payload::X&)` overload(s); those are not forced
+ *       `submitData(const Payload::X&)` overload(s); those are not forced
  *       into this base class so adding a new payload type never requires
  *       touching `Manager` itself. Combine with `Singleton<TDerived>` for
  *       singleton behavior.
@@ -40,12 +40,12 @@ class Manager
     virtual ~Manager() = default;
 
     /// Called once at startup.
-    virtual void Init() = 0;
+    virtual void init() = 0;
 
     /// Called once per frame, per the Core Engine Loop's "Process Managers" step.
-    virtual void Process() = 0;
+    virtual void process() = 0;
 
     /// Called once at shutdown.
-    virtual void Shutdown() = 0;
+    virtual void shutdown() = 0;
 };
 } // namespace aegis
