@@ -1,92 +1,54 @@
 {
     "version": 6,
-    "cmakeMinimumRequired": {
-        "major": 3,
-        "minor": 23,
-        "patch": 0
-    },
     "configurePresets": [
         {
-            "name": "host-debug",
-            "displayName": "Aegis Engine Host Debug",
-            "binaryDir": "${sourceDir}/out/build/host-debug",
+            "name": "base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/out/build/${presetName}"
+        },
+        {
+            "name": "debug",
+            "displayName": "Aegis Engine (Debug)",
+            "inherits": "base",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "AEGIS_ENGINE_BUILD_TESTS": "ON"
+                "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
-            "name": "host-release",
-            "displayName": "Aegis Engine Host Release",
-            "binaryDir": "${sourceDir}/out/build/host-release",
+            "name": "release",
+            "displayName": "Aegis Engine (Release)",
+            "inherits": "base",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "AEGIS_ENGINE_BUILD_TESTS": "ON"
-            }
-        },
-        {
-            "name": "host-no-tests",
-            "displayName": "Aegis Engine Host (Library Only)",
-            "binaryDir": "${sourceDir}/out/build/host-no-tests",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "AEGIS_ENGINE_BUILD_TESTS": "OFF"
+                "CMAKE_BUILD_TYPE": "Release"
             }
         },
         {
             "name": "default",
-            "displayName": "Default (Host Debug)",
-            "inherits": "host-debug"
-        },
-        {
-            "name": "release",
-            "displayName": "Default (Host Release)",
-            "inherits": "host-release"
-        },
-        {
-            "name": "debug",
-            "displayName": "Default (Host Debug)",
-            "inherits": "host-debug"
+            "displayName": "Default (Debug)",
+            "inherits": "debug"
         }
     ],
     "buildPresets": [
         {
-            "name": "build-tests",
-            "displayName": "Build Aegis Engine Tests",
-            "configurePreset": "host-debug",
+            "name": "debug",
+            "displayName": "Build Aegis Engine (Debug)",
+            "configurePreset": "debug",
             "targets": [
-                "aegis_engine_test"
+                "aegis_engine"
             ]
         },
         {
-            "name": "build-release",
-            "displayName": "Configure Aegis Engine Library Interface",
-            "configurePreset": "host-no-tests"
+            "name": "release",
+            "displayName": "Build Aegis Engine (Release)",
+            "configurePreset": "release",
+            "targets": [
+                "aegis_engine"
+            ]
         },
         {
             "name": "default",
-            "displayName": "Default (Build Tests)",
-            "inherits": "build-tests"
-        },
-        {
-            "name": "debug",
-            "displayName": "Build Aegis Engine Debug",
-            "configurePreset": "host-debug"
-        },
-        {
-            "name": "release",
-            "displayName": "Build Aegis Engine Release",
-            "configurePreset": "host-release"
-        }
-    ],
-    "testPresets": [
-        {
-            "name": "test-host",
-            "displayName": "Run Aegis Engine Host Tests",
-            "configurePreset": "host-debug",
-            "output": {
-                "outputOnFailure": true
-            }
+            "displayName": "Default (Debug)",
+            "inherits": "debug"
         }
     ]
 }
