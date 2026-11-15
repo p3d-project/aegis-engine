@@ -1,6 +1,6 @@
 # Aegis Engine
 
-Aegis Engine is a lightweight, strictly-bounded C++17 Entity-Component (EC) and Data-Oriented Design (DOD) hybrid game framework. It was originally engineered for the Persona 3 Dual (P3D) project, targeting the Nintendo DS platform.
+Aegis Engine is a lightweight, strictly-bounded C++23 Entity-Component (EC) and Data-Oriented Design (DOD) hybrid game framework. It was originally engineered for the Persona 3 Dual (P3D) project, targeting the Nintendo DS platform.
 
 Built for highly constrained embedded environments, Aegis guarantees zero dynamic memory allocation during the core game loop to prevent memory fragmentation, and strictly avoids floating-point math to accommodate hardware without a dedicated FPU.
 

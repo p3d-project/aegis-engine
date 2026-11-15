@@ -157,13 +157,8 @@ class Engine
      * @tparam Args Constructor argument types, forwarded to `T`'s constructor.
      * @return Pointer to the new component, or `nullptr` if the pool is exhausted.
      */
-    template <typename T, typename... Args> T* createComponent(Args&&... args)
+    template <ComponentType T, typename... Args> T* createComponent(Args&&... args)
     {
-        static_assert(std::is_base_of<Component, T>::value, "\n\n[AE ERROR]: T must derive from Component");
-        static_assert(detail::has_type_id<T>::value,
-                      "\n\n[AE ERROR]: Component is missing its TYPE_ID\n"
-                      "You must define: static constexpr ComponentTypeID TYPE_ID = ...\n");
-
         T* component = componentPool.template create<T>(std::forward<Args>(args)...);
         if (component != nullptr)
         {

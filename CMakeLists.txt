@@ -12,7 +12,7 @@ file(GLOB_RECURSE AEGIS_ENGINE_PUBLIC_HEADERS CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp
 )
 
-target_compile_features(aegis_engine INTERFACE cxx_std_17)
+target_compile_features(aegis_engine INTERFACE cxx_std_23)
 
 target_include_directories(aegis_engine
     INTERFACE
