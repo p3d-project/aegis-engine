@@ -37,6 +37,24 @@ cmake --build --preset debug
 ./out/build/debug/aegis_engine
 ```
 
+### Flatbuffers
+See https://flatbuffers.dev/quick_start/
+
+```bash
+# Move into flatbuffers repo
+cd libs/flatbuffers
+
+# Build the compiler for FlatBuffers
+cmake -G "Unix Makefiles"
+make -j
+
+## Move into /source/flatbuffers
+cd ../.. && cd source/flatbuffers
+
+# Generate code for your language(s)
+/aegis-engine/libs/flatbuffers/flatc --cpp /aegis-engine/source/flatbuffers/monster.fbs
+```
+
 ## Future
 - [ ] Add Docker container
 - [ ] Add library mentions in README

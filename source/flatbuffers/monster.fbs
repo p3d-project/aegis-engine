@@ -1,0 +1,6 @@
+table Monster {
+  name:string;
+  health:int;
+}
+
+root_type Monster;
