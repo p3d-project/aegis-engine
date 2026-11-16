@@ -1,24 +1,12 @@
 /**
- * @file main.cpp
- * @brief Example showing how to use EnTT
- * @note Example from https://github.com/skypjack/entt#code-example
- * @author Taha Rashid (TheBossT910 / thebosst)
+ * @file    main.cpp
+ * @brief   Example showing how to use EnTT
+ * @note    Example from https://github.com/skypjack/entt#code-example
+ * @author  Taha Rashid (TheBossT910 / thebosst)
  */
 
+#include "components.hpp"
 #include <entt/entt.hpp>
-
-// components are structs
-struct position
-{
-    float x;
-    float y;
-};
-
-struct velocity
-{
-    float dx;
-    float dy;
-};
 
 // update loop
 void update(entt::registry& registry)
@@ -60,6 +48,11 @@ int main()
         }
     }
 
-    update(registry);
+    // simulate update loop
+    for (int i = 0; i < 10; i++)
+    {
+        update(registry);
+    }
+
     printf("done!");
 }
