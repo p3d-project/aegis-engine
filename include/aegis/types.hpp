@@ -4,16 +4,17 @@
  * @file types.hpp
  * @brief Aegis Engine — core type aliases, default
  *        engine capacity limits, the global Pub/Sub message bus, and the
- *        small CRTP/SFINAE helpers (`Singleton`, `has_type_id`) shared by
+ *        small CRTP helper and concepts (`Singleton`, `ComponentType`) shared by
  *        every other Aegis header.
  *
  * @note This is the foundation header — every other file in the library
  *       depends on it, directly or transitively. It defines no game-specific
  *       data; game code supplies its own event, payload, and component-type
  *       definitions on top of these primitives.
- * @note Requires C++17 (inline variables, `std::void_t`).
+ * @note Requires C++23.
  */
 
+#include <concepts>
 #include <cstdint>
 #include <type_traits>
 
@@ -116,17 +117,15 @@ inline etl::message_router_id_t nextComponentRouterID()
     return next++;
 }
 
-/**
-* @brief SFINAE trait to verify a Component has defined TYPE_ID.
-*/
-template <typename, typename = void> struct has_type_id : std::false_type
-{
-};
-
-template <typename T> struct has_type_id<T, std::void_t<decltype(T::TYPE_ID)>> : std::true_type
-{
-};
 } // namespace detail
+
+/// @brief `T` has a static `TYPE_ID`.
+template <typename T>
+concept HasTypeId = requires { T::TYPE_ID; };
+
+/// @brief `T` is a Component with a `TYPE_ID`.
+template <typename T>
+concept ComponentType = std::derived_from<T, Component> && HasTypeId<T>;
 
 // =============================================================================
 // Singleton — CRTP helper for System/Manager singletons

@@ -7,7 +7,7 @@
  *        (`getComponent<T>`) and untyped (`getComponentByID`) lookup.
  *
  * @note Entities do not own Component memory — see `Engine`'s pools.
- * @note Requires C++17.
+ * @note Requires C++23.
  */
 
 #include <aegis/component.hpp>
@@ -61,7 +61,7 @@ class Entity
      * @tparam T The concrete Component type (must define `TYPE_ID`).
      * @return Pointer to the component, or nullptr if not found.
      */
-    template <typename T> T* getComponent() const;
+    template <ComponentType T> T* getComponent() const;
 
     /**
      * @brief Detaches the Component of the given type, calling its
@@ -78,7 +78,7 @@ class Entity
      * @brief Detaches and destroys a Component of the specified type.
      * @tparam T The concrete Component type (must define `TYPE_ID`).
      */
-    template <typename T> void removeComponent();
+    template <ComponentType T> void removeComponent();
 
     /**
      * @brief Removes a component pointer from this entity's internal list
@@ -156,11 +156,8 @@ inline Component* Entity::getComponentByID(ComponentTypeID type) const
     return nullptr;
 }
 
-template <typename T> inline T* Entity::getComponent() const
+template <ComponentType T> inline T* Entity::getComponent() const
 {
-    static_assert(detail::has_type_id<T>::value,
-                  "\n\n[AE ERROR]: Component is missing its TYPE_ID\n"
-                  "You must define: static constexpr ComponentTypeID TYPE_ID = ...\n");
     return static_cast<T*>(getComponentByID(T::TYPE_ID));
 }
 
@@ -179,11 +176,8 @@ inline void Entity::removeComponentByID(ComponentTypeID type)
     }
 }
 
-template <typename T> inline void Entity::removeComponent()
+template <ComponentType T> inline void Entity::removeComponent()
 {
-    static_assert(detail::has_type_id<T>::value,
-                  "\n\n[AE ERROR]: Component is missing its TYPE_ID\n"
-                  "You must define: static constexpr ComponentTypeID TYPE_ID = ...\n");
     removeComponentByID(T::TYPE_ID);
 }
 
