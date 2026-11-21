@@ -53,7 +53,7 @@ class UIWidget
     etl::span<UIWidget*> children_;
 };
 
-UIWidget uiRoot;
+inline UIWidget uiRoot{0, 0};
 
 /**
  * @brief Draws the UI root

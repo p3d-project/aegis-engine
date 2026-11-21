@@ -6,6 +6,8 @@
  */
 
 // components are structs
+#include <string>
+#include <tuple>
 
 /**
  * @brief ...

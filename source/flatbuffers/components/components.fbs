@@ -1,0 +1,26 @@
+// TODO: we should only be able to define components here
+// not hardcoded within our code
+// then, we should be able to reference these auto-generated componnets
+// to ensure data-driven codebase (like YANG modelling!)
+
+table PositionData {
+  x:float;
+  y:float;
+}
+
+table VelocityData {
+  dx:float;
+  dy:float;
+}
+
+table EntityData {
+  name:string;
+  position:PositionData;
+  velocity:VelocityData;
+}
+
+table Components {
+  entities:[EntityData];
+}
+
+root_type Components;
