@@ -4,36 +4,66 @@
  * @author  Taha Rashid (TheBossT910 / thebosst)
 **/
 
-// SceneDefs are going to be auto-generated
-
 #include "scene.hpp"
+#include "components_generated.h"
+#include "tags_generated.h"
+#include <cstdint>
+#include <fstream>
+#include <iterator>
+#include <vector>
 
-void loadScene(entt::registry& registry, SceneDef sceneDef)
+void loadScene(entt::registry& registry, const Scenes::SceneDefT& sceneDef)
 {
     unloadScene(registry);
 
-    auto& scene = registry.ctx().emplace<SceneData>();
-    auto& gfx = registry.ctx().get<GraphicsData>();
+    // set data
+    if (sceneDef.scene_data)
+    {
+        registry.ctx().emplace<Scenes::SceneDataT>(*sceneDef.scene_data);
+    }
+    if (sceneDef.graphics_data)
+    {
+        registry.ctx().emplace<Scenes::GraphicsDataT>(*sceneDef.graphics_data);
+    }
 
-    SceneData& sceneData = sceneDef.sceneData;
-    GraphicsData& graphicsData = sceneDef.graphicsData;
-    SceneEntity* sceneEntities = sceneDef.sceneEntities;
+    // add entities
+    for (const auto& sceneEntity : sceneDef.entities)
+    {
+        const entt::entity entity = registry.create();
+        registry.emplace<Tags::SceneEntityTagT>(entity);
 
-    // set scene data
-    scene = sceneData;
+        // add components
+        if (sceneEntity->position)
+        {
+            registry.emplace<Components::PositionT>(entity, *sceneEntity->position);
+        }
+        if (sceneEntity->velocity)
+        {
+            registry.emplace<Components::VelocityT>(entity, *sceneEntity->velocity);
+        }
+    }
+}
 
-    // set graphics
-    gfx = graphicsData;
+void loadScene(entt::registry& registry, const char* binaryPath)
+{
+    std::ifstream file(binaryPath, std::ios::binary);
+    // TODO: replace std::vector with etl::vector
+    const std::vector<std::uint8_t> buffer{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
 
-    // set entities
-    // loop through sceneEntities and set
-    // automatically set anything in sceneEntity with SceneEntityTag
-    // ...
+    flatbuffers::Verifier verifier(buffer.data(), buffer.size());
+    if (!file || !Scenes::VerifySceneDefBuffer(verifier))
+    {
+        return;
+    }
+
+    std::unique_ptr<Scenes::SceneDefT> sceneDef(Scenes::UnPackSceneDef(buffer.data()));
+    loadScene(registry, *sceneDef);
 }
 
 void unloadScene(entt::registry& registry)
 {
-    auto view = registry.view<SceneEntityTag>();
+    auto view = registry.view<Tags::SceneEntityTagT>();
     registry.destroy(view.begin(), view.end());
-    registry.ctx().erase<SceneData>();
+    registry.ctx().erase<Scenes::SceneDataT>();
+    registry.ctx().erase<Scenes::GraphicsDataT>();
 }

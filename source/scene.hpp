@@ -4,13 +4,14 @@
  * @author  Taha Rashid (TheBossT910 / thebosst)
 **/
 
-#include "components.hpp"
+#include "scenes_generated.h"
 #include <entt/entt.hpp>
 
 /**
  * @brief ...
  */
-void loadScene(entt::registry& registry, SceneDef sceneDef);
+void loadScene(entt::registry& registry, const Scenes::SceneDefT& sceneDef);
+void loadScene(entt::registry& registry, const char* binaryPath);
 
 /**
  * @brief ...

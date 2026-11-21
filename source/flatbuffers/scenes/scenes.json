@@ -1,0 +1,56 @@
+{
+  "id": 1,
+  "scene_data": {
+    "name": "Example Scene"
+  },
+  "graphics_data": {
+    "video_set_mode": -1,
+    "bg_ext_palette_enable": false,
+    "set_brightness": {
+      "first": -1,
+      "second": -1
+    },
+    "bg_init": [
+      {"first": -1, "second": -1, "third": -1, "fourth": -1, "fifth": -1},
+      {"first": -1, "second": -1, "third": -1, "fourth": -1, "fifth": -1},
+      {"first": -1, "second": -1, "third": -1, "fourth": -1, "fifth": -1},
+      {"first": -1, "second": -1, "third": -1, "fourth": -1, "fifth": -1}
+    ],
+    "bg_init_sub": [
+      {"first": -1, "second": -1, "third": -1, "fourth": -1, "fifth": -1},
+      {"first": -1, "second": -1, "third": -1, "fourth": -1, "fifth": -1},
+      {"first": -1, "second": -1, "third": -1, "fourth": -1, "fifth": -1},
+      {"first": -1, "second": -1, "third": -1, "fourth": -1, "fifth": -1}
+    ],
+    "bg_set_priority": [
+      {"first": -1, "second": -1},
+      {"first": -1, "second": -1},
+      {"first": -1, "second": -1},
+      {"first": -1, "second": -1},
+      {"first": -1, "second": -1},
+      {"first": -1, "second": -1},
+      {"first": -1, "second": -1},
+      {"first": -1, "second": -1}
+    ]
+  },
+  "entities": [
+    {
+      "name": "Entity 1",
+      "position": {
+        "x": 10,
+        "y": 20
+      },
+      "velocity": {
+        "dx": 1,
+        "dy": -1
+      }
+    },
+    {
+      "name": "Entity 2",
+      "position": {
+        "x": 123,
+        "y": 123
+      }
+    }
+  ]
+}

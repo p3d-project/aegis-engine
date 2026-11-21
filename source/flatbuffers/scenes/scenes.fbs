@@ -1,0 +1,58 @@
+include "components/components.fbs";
+
+// TODO: figure out a way to import enums from the BlocksDS SDK
+
+namespace Scenes;
+
+struct IntPair {
+  first:int;
+  second:int;
+}
+
+struct IntFive {
+  first:int;
+  second:int;
+  third:int;
+  fourth:int;
+  fifth:int;
+}
+
+table SceneData {
+  name:string;
+}
+
+table GraphicsData {
+  video_set_mode:int = -1;
+  video_set_mode_sub:int = -1;
+  vram_set_bank_a:int = -1;
+  vram_set_bank_b:int = -1;
+  vram_set_bank_c:int = -1;
+  vram_set_bank_d:int = -1;
+  vram_set_bank_e:int = -1;
+  vram_set_bank_f:int = -1;
+  vram_set_bank_g:int = -1;
+  vram_set_bank_h:int = -1;
+  vram_set_bank_i:int = -1;
+  bg_ext_palette_enable:bool = false;
+  bg_ext_palette_enable_sub:bool = false;
+  set_brightness:IntPair;
+  bg_init:[IntFive];
+  bg_init_sub:[IntFive];
+  bg_set_priority:[IntPair];
+}
+
+// NOTE: add new components here. By default, all fields are optional
+table Entity {
+  name:string;
+  position:Components.Position;
+  velocity:Components.Velocity;
+}
+
+table SceneDef {
+  id:int;
+  scene_data:SceneData;
+  graphics_data:GraphicsData;
+  entities:[Entity];
+}
+
+root_type SceneDef;

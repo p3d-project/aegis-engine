@@ -5,26 +5,22 @@
  * @author  Taha Rashid (TheBossT910 / thebosst)
  */
 
-#include "components.hpp"
 #include "scene.hpp"
 #include "systems/systems.hpp"
 #include "ui.hpp"
 #include <entt/entt.hpp>
 
-// TODO: make an example scene
 // TODO: make an example UI
 
 // main program execution
 int main()
 {
+    printf("start!\n\n");
+
     entt::registry registry;
 
-    // set global contexts
-    registry.ctx().emplace<GraphicsData>();
-
     // load initial scene
-    SceneDef scene; // TODO: add actual data
-    loadScene(registry, scene);
+    loadScene(registry, SCENES_BINARY_PATH);
 
     // update loop
     for (int i = 0; i < 10; i++)
@@ -39,5 +35,5 @@ int main()
         ui(registry);
     }
 
-    printf("done!");
+    printf("done!\n\n");
 }

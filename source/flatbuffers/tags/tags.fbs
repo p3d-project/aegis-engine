@@ -1,0 +1,4 @@
+namespace Tags;
+
+table SceneEntityTag {
+}

@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.23)
 project(aegis_engine LANGUAGES CXX)
 
 add_subdirectory(libs/entt EXCLUDE_FROM_ALL)
+set(FLATBUFFERS_BUILD_FLATC ON CACHE BOOL "Build the FlatBuffers compiler" FORCE)
 add_subdirectory(libs/flatbuffers EXCLUDE_FROM_ALL)
 
 set(FLATBUFFERS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source/flatbuffers")
@@ -20,30 +21,29 @@ flatbuffers_generate_headers(
     TARGET aegis_flatbuffers
     SCHEMAS ${FLATBUFFERS_SCHEMAS}
     INCLUDE ${FLATBUFFERS_SOURCE_DIR}
+    FLAGS --gen-object-api
 )
 
 set(FLATBUFFERS_BINARY_TARGETS)
-foreach(FLATBUFFERS_SCHEMA ${FLATBUFFERS_SCHEMAS})
-    get_filename_component(FLATBUFFERS_STEM "${FLATBUFFERS_SCHEMA}" NAME_WE)
+foreach(FLATBUFFERS_JSON ${FLATBUFFERS_JSON_FILES})
+    get_filename_component(FLATBUFFERS_JSON_DIR "${FLATBUFFERS_JSON}" DIRECTORY)
+    get_filename_component(FLATBUFFERS_JSON_STEM "${FLATBUFFERS_JSON}" NAME_WE)
+    set(FLATBUFFERS_SCHEMA "${FLATBUFFERS_JSON_DIR}/${FLATBUFFERS_JSON_STEM}.fbs")
 
-    set(FLATBUFFERS_MATCHING_JSON)
-    foreach(FLATBUFFERS_JSON ${FLATBUFFERS_JSON_FILES})
-        get_filename_component(FLATBUFFERS_JSON_STEM
-            "${FLATBUFFERS_JSON}" NAME_WE
+    if(EXISTS "${FLATBUFFERS_SCHEMA}")
+        file(RELATIVE_PATH FLATBUFFERS_RELATIVE_SCHEMA
+            "${FLATBUFFERS_SOURCE_DIR}" "${FLATBUFFERS_SCHEMA}"
         )
-        if(FLATBUFFERS_JSON_STEM STREQUAL FLATBUFFERS_STEM)
-            list(APPEND FLATBUFFERS_MATCHING_JSON "${FLATBUFFERS_JSON}")
-        endif()
-    endforeach()
-
-    if(FLATBUFFERS_MATCHING_JSON)
+        string(SHA256 FLATBUFFERS_SCHEMA_HASH
+            "${FLATBUFFERS_RELATIVE_SCHEMA}"
+        )
         set(FLATBUFFERS_BINARY_TARGET
-            aegis_flatbuffers_${FLATBUFFERS_STEM}_binary
+            aegis_flatbuffers_binary_${FLATBUFFERS_SCHEMA_HASH}
         )
         flatbuffers_generate_binary_files(
             TARGET ${FLATBUFFERS_BINARY_TARGET}
             SCHEMA "${FLATBUFFERS_SCHEMA}"
-            JSON_FILES ${FLATBUFFERS_MATCHING_JSON}
+            JSON_FILES "${FLATBUFFERS_JSON}"
             INCLUDE ${FLATBUFFERS_SOURCE_DIR}
             OUTPUT_DIR "${FLATBUFFERS_DATA_DIR}"
         )
@@ -69,16 +69,14 @@ target_link_libraries(aegis_engine_lib INTERFACE
 
 add_executable(aegis_engine
     source/main.cpp
-    source/flatbuffers/components_loader.cpp
     source/scene.cpp
     source/ui.cpp
     source/systems/systems.cpp
-    source/flatbuffers/scenes/sceneLoader.hpp
 )
 target_link_libraries(aegis_engine PRIVATE
     aegis::engine
     ${FLATBUFFERS_BINARY_TARGETS}
 )
 target_compile_definitions(aegis_engine PRIVATE
-    COMPONENTS_BINARY_PATH="${FLATBUFFERS_DATA_DIR}/components.bin"
+    SCENES_BINARY_PATH="${FLATBUFFERS_DATA_DIR}/scenes.bin"
 )

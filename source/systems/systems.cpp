@@ -6,44 +6,38 @@
  */
 
 #include "systems.hpp"
-#include "components.hpp"
+#include "components_generated.h"
+#include "scenes_generated.h"
 
 void exampleSystem(entt::registry& registry)
 {
-    auto view = registry.view<const Position, Velocity>();
-
-    // use a callback
-    view.each([](const auto& pos, auto& vel) { /* ... */ });
-
-    // use an extended callback
-    view.each([](const auto entity, const auto& pos, auto& vel) { /* ... */ });
-
-    // use a range-for
-    for (auto [entity, pos, vel] : view.each())
+    for (const entt::entity entity : registry.view<entt::entity>())
     {
-        // ...
+        if (const auto* pos = registry.try_get<const Components::PositionT>(entity))
+        {
+            printf("pos:x - %f\n", pos->x);
+            printf("pos:y - %f\n", pos->y);
+        }
+
+        if (const auto* vel = registry.try_get<const Components::VelocityT>(entity))
+        {
+            printf("vel:dx - %f\n", vel->dx);
+            printf("vel:dy - %f\n", vel->dy);
+        }
     }
 
-    // use forward iterators and get only the components of interest
-    for (auto entity : view)
-    {
-        auto& pos = view.get<Position>(entity);
-        auto& vel = view.get<Velocity>(entity);
-        // ...
-    }
+    printf("exampleSystem: running\n\n");
 }
 
 void renderSystem(entt::registry& registry)
 {
-    auto view = registry.view<const GraphicsData>();
-    for (auto entity : view)
-    {
-        auto& graphics = view.get<GraphicsData>(entity);
-        // ...
-    }
+    // GraphicsDataT is stored as registry context data
+    // ...
+    printf("renderSystem: running\n\n");
 }
 
 void inputSystem(entt::registry& registry)
 {
     // ...
+    printf("inputSystem: running\n\n");
 }

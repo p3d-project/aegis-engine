@@ -1,26 +1,12 @@
-// TODO: we should only be able to define components here
-// not hardcoded within our code
-// then, we should be able to reference these auto-generated componnets
-// to ensure data-driven codebase (like YANG modelling!)
+namespace Components;
+// TODO: add fpm support
 
-table PositionData {
+table Position {
   x:float;
   y:float;
 }
 
-table VelocityData {
+table Velocity {
   dx:float;
   dy:float;
 }
-
-table EntityData {
-  name:string;
-  position:PositionData;
-  velocity:VelocityData;
-}
-
-table Components {
-  entities:[EntityData];
-}
-
-root_type Components;
