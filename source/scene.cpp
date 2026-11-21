@@ -4,54 +4,36 @@
  * @author  Taha Rashid (TheBossT910 / thebosst)
 **/
 
+// SceneDefs are going to be auto-generated
+
 #include "scene.hpp"
-#include <etl/stack.h>
 
-// TODO: SceneDef - the actual defined view. has data on entity setup, view loading, etc. init(), update(), cleanup() overrides
-
-constexpr int stackSize = 4;
-
-etl::stack<Scene, stackSize> activeStack;
-etl::stack<Scene, stackSize> initStack;
-etl::stack<Scene, stackSize> cleanupStack;
-
-void push(Scene& scene)
+void loadScene(entt::registry& registry, SceneDef sceneDef)
 {
-    initStack.push(scene);
-    activeStack.push(scene);
-}
+    unloadScene(registry);
 
-void pop()
-{
-    cleanupStack.push(etl::move(activeStack.top()));
-    activeStack.pop();
-}
+    auto& scene = registry.ctx().emplace<SceneData>();
+    auto& gfx = registry.ctx().get<GraphicsData>();
 
-void session()
-{
-    // shared data
+    SceneData& sceneData = sceneDef.sceneData;
+    GraphicsData& graphicsData = sceneDef.graphicsData;
+    SceneEntity* sceneEntities = sceneDef.sceneEntities;
+
+    // set scene data
+    scene = sceneData;
+
+    // set graphics
+    gfx = graphicsData;
+
+    // set entities
+    // loop through sceneEntities and set
+    // automatically set anything in sceneEntity with SceneEntityTag
     // ...
+}
 
-    // init new scenes
-    while (!initStack.empty())
-    {
-        Scene& scene = initStack.top();
-        scene.init();
-        initStack.pop();
-    }
-
-    // update active scene
-    if (!activeStack.empty())
-    {
-        Scene& scene = activeStack.top();
-        scene.update();
-    }
-
-    // cleanup old scenes
-    while (!cleanupStack.empty())
-    {
-        Scene& scene = cleanupStack.top();
-        scene.cleanup();
-        cleanupStack.pop();
-    }
+void unloadScene(entt::registry& registry)
+{
+    auto view = registry.view<SceneEntityTag>();
+    registry.destroy(view.begin(), view.end());
+    registry.ctx().erase<SceneData>();
 }

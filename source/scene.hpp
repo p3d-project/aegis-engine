@@ -1,33 +1,18 @@
 /**
  * @file    scene.hpp
- * @brief   Header file for scene
+ * @brief   ...
  * @author  Taha Rashid (TheBossT910 / thebosst)
 **/
 
-class Scene
-{
-  public:
-    std::string name;
-
-    void init();
-    void update();
-    void cleanup();
-};
+#include "components.hpp"
+#include <entt/entt.hpp>
 
 /**
- * @brief Push a new Scene onto the stack
- * @note Exposed to Scene
- * @param scene The Scene to push
+ * @brief ...
  */
-void push(Scene& scene);
+void loadScene(entt::registry& registry, SceneDef sceneDef);
 
 /**
- * @brief Pop the currently active Scene (at the top of the stack)
- * @note Exposed to Scene
+ * @brief ...
  */
-void pop();
-
-/**
- * @brief Manages Scenes
- */
-void session();
+void unloadScene(entt::registry& registry);

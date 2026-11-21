@@ -10,7 +10,7 @@
 
 void exampleSystem(entt::registry& registry)
 {
-    auto view = registry.view<const position, velocity>();
+    auto view = registry.view<const Position, Velocity>();
 
     // use a callback
     view.each([](const auto& pos, auto& vel) { /* ... */ });
@@ -27,8 +27,23 @@ void exampleSystem(entt::registry& registry)
     // use forward iterators and get only the components of interest
     for (auto entity : view)
     {
-        auto& pos = view.get<position>(entity);
-        auto& vel = view.get<velocity>(entity);
+        auto& pos = view.get<Position>(entity);
+        auto& vel = view.get<Velocity>(entity);
         // ...
     }
+}
+
+void renderSystem(entt::registry& registry)
+{
+    auto view = registry.view<const GraphicsData>();
+    for (auto entity : view)
+    {
+        auto& graphics = view.get<GraphicsData>(entity);
+        // ...
+    }
+}
+
+void inputSystem(entt::registry& registry)
+{
+    // ...
 }
