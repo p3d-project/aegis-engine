@@ -46,6 +46,7 @@ table Entity {
   name:string;
   position:Components.Position;
   velocity:Components.Velocity;
+  input:Components.Input;
 }
 
 table SceneDef {

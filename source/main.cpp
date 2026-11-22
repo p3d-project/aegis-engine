@@ -10,14 +10,14 @@
 #include "ui.hpp"
 #include <entt/entt.hpp>
 
-// TODO: make an example UI
-
 // main program execution
 int main()
 {
     printf("start!\n\n");
 
     entt::registry registry;
+
+    const entt::entity entity = registry.create();
 
     // load initial scene
     loadScene(registry, SCENES_BINARY_PATH);

@@ -8,5 +8,9 @@
 
 void ui(entt::registry& registry)
 {
-    uiRoot.draw(registry);
+    // uiRoot.draw(registry);
+
+    UIButton button(0, 0, 3, 5, []() { printf("button clicked!"); });
+
+    button.draw(registry);
 }

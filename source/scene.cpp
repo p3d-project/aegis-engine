@@ -41,6 +41,10 @@ void loadScene(entt::registry& registry, const Scenes::SceneDefT& sceneDef)
         {
             registry.emplace<Components::VelocityT>(entity, *sceneEntity->velocity);
         }
+        if (sceneEntity->input)
+        {
+            registry.emplace<Components::InputT>(entity, *sceneEntity->input);
+        }
     }
 }
 

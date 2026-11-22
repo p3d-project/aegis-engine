@@ -10,3 +10,7 @@ table Velocity {
   dx:float;
   dy:float;
 }
+
+table Input {
+  key:int;
+}
