@@ -5,11 +5,12 @@
 **/
 
 #include "components_generated.h"
-#include <cstdio>
 #include <entt/entt.hpp>
 #include <etl/span.h>
-#include <functional>
+#include <etl/vector.h>
 #include <string>
+
+constexpr int maxUIWidgetChildren = 5;
 
 inline void printIndent(int spaces)
 {
@@ -28,11 +29,21 @@ class UIWidget
     }
 
     // Container constructor
-    UIWidget(int x, int y, etl::span<UIWidget*> children) : x_(x), y_(y), children_(children)
+    UIWidget(int x, int y, etl::span<UIWidget*> children) : x_(x), y_(y), children_()
     {
+        for (UIWidget* child : children)
+        {
+            children_.push_back(child);
+        }
     }
 
     virtual ~UIWidget() = default;
+
+    UIWidget& addChild(UIWidget& child)
+    {
+        children_.push_back(&child);
+        return *this;
+    }
 
     /**
      * @brief Draws the UIWidget and any children
@@ -64,10 +75,10 @@ class UIWidget
     }
 
   private:
-    etl::span<UIWidget*> children_;
+    etl::vector<UIWidget*, maxUIWidgetChildren> children_;
 };
 
-inline UIWidget uiRoot{0, 0};
+// inline UIWidget uiRoot{0, 0};
 
 /**
  * @brief Draws the UI root
@@ -79,22 +90,12 @@ class UIButton : public UIWidget
 {
   public:
     // Leaf constructor
-    UIButton(int x, int y, int length, int width, std::function<void()> onClick)
-        : UIButton(x, y, length, width, "Button", onClick)
-    {
-    }
-
     UIButton(int x, int y, int length, int width, const std::string& label, std::function<void()> onClick)
         : UIWidget(x, y), length_(length), width_(width), label_(label), onClick_(onClick)
     {
     }
 
     // Container constructor
-    UIButton(int x, int y, etl::span<UIWidget*> children, int length, int width, std::function<void()> onClick)
-        : UIButton(x, y, children, length, width, "Button", onClick)
-    {
-    }
-
     UIButton(int x,
              int y,
              etl::span<UIWidget*> children,
@@ -151,6 +152,10 @@ class UILabel : public UIWidget
 class UIPanel : public UIWidget
 {
   public:
+    UIPanel(int x, int y, const std::string& title) : UIWidget(x, y), title_(title)
+    {
+    }
+
     UIPanel(int x, int y, const std::string& title, etl::span<UIWidget*> children)
         : UIWidget(x, y, children), title_(title)
     {
