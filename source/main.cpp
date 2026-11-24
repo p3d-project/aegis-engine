@@ -23,7 +23,7 @@ int main()
     loadScene(registry, SCENES_BINARY_PATH);
 
     // update loop
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 3; i++)
     {
         // run systems
         inputSystem(registry);
