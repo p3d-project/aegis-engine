@@ -1,6 +1,6 @@
 /**
  * @file    ui.hpp
- * @brief   ...
+ * @brief   Defines UIWidget and derived classes
  * @author  Taha Rashid (TheBossT910 / thebosst)
 **/
 
@@ -12,6 +12,9 @@
 
 constexpr int maxUIWidgetChildren = 5;
 
+/**
+ * @brief Helper function to print text indents
+ */
 inline void printIndent(int spaces)
 {
     for (int i = 0; i < spaces; i++)
@@ -20,6 +23,9 @@ inline void printIndent(int spaces)
     }
 }
 
+/**
+ * @brief Base UI widget class
+ */
 class UIWidget
 {
   public:
@@ -86,6 +92,9 @@ class UIWidget
  */
 void ui(entt::registry& registry);
 
+/**
+ * @brief UI button with click action
+ */
 class UIButton : public UIWidget
 {
   public:
@@ -130,6 +139,9 @@ class UIButton : public UIWidget
     std::string label_;
 };
 
+/**
+ * @brief UI label
+ */
 class UILabel : public UIWidget
 {
   public:
@@ -149,6 +161,9 @@ class UILabel : public UIWidget
     std::string text_;
 };
 
+/**
+ * @brief UI panel (grouping)
+ */
 class UIPanel : public UIWidget
 {
   public:

@@ -2,7 +2,7 @@
 
 /**
  * @file    types.hpp
- * @brief   ...
+ * @brief   Defines engine-wide types
  * @author  ...
  */
 

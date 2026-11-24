@@ -40,8 +40,7 @@ cmake --build --preset debug
 ### Flatbuffers
 See https://flatbuffers.dev/quick_start/
 
-## Future
-- [ ] Add Docker container
+## README TODO
 - [ ] Add library mentions in README
 
 ---

@@ -29,6 +29,7 @@ void exampleSystem(entt::registry& registry)
     printf("exampleSystem: running\n\n");
 }
 
+// TODO: implement
 void renderSystem(entt::registry& registry)
 {
     // GraphicsDataT is stored as registry context data
@@ -36,6 +37,7 @@ void renderSystem(entt::registry& registry)
     printf("renderSystem: running\n\n");
 }
 
+// TODO: implement
 void inputSystem(entt::registry& registry)
 {
     // ...

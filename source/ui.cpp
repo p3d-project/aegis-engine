@@ -1,6 +1,6 @@
 /**
  * @file    ui.cpp
- * @brief   ...
+ * @brief   UI implementation
  * @author  Taha Rashid (TheBossT910 / thebosst)
 **/
 

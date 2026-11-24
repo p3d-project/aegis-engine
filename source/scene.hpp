@@ -1,6 +1,6 @@
 /**
  * @file    scene.hpp
- * @brief   ...
+ * @brief   Defines scene functions
  * @author  Taha Rashid (TheBossT910 / thebosst)
 **/
 
@@ -8,12 +8,12 @@
 #include <entt/entt.hpp>
 
 /**
- * @brief ...
+ * @brief Load scene into ECS
  */
 void loadScene(entt::registry& registry, const Scenes::SceneDefT& sceneDef);
 void loadScene(entt::registry& registry, const char* binaryPath);
 
 /**
- * @brief ...
+ * @brief Unload scene from ECS
  */
 void unloadScene(entt::registry& registry);
