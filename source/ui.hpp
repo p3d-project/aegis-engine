@@ -7,6 +7,7 @@
 #pragma once
 #include "components_generated.h"
 #include <entt/entt.hpp>
+#include <etl/delegate.h>
 #include <etl/span.h>
 #include <etl/vector.h>
 #include <string>
@@ -100,7 +101,7 @@ class UIButton : public UIWidget
 {
   public:
     // Leaf constructor
-    UIButton(int x, int y, int length, int width, const std::string& label, std::function<void()> onClick)
+    UIButton(int x, int y, int length, int width, const std::string& label, etl::delegate<void()> onClick)
         : UIWidget(x, y), length_(length), width_(width), label_(label), onClick_(onClick)
     {
     }
@@ -112,7 +113,7 @@ class UIButton : public UIWidget
              int length,
              int width,
              const std::string& label,
-             std::function<void()> onClick)
+             etl::delegate<void()> onClick)
         : UIWidget(x, y, children), length_(length), width_(width), label_(label), onClick_(onClick)
     {
     }
@@ -136,7 +137,7 @@ class UIButton : public UIWidget
     }
 
   private:
-    std::function<void()> onClick_;
+    etl::delegate<void()> onClick_;
     int length_, width_;
     std::string label_;
 };
