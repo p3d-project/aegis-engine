@@ -11,7 +11,7 @@
 
 void exampleSystem(entt::registry& registry)
 {
-    for (const entt::entity entity : registry.view<entt::entity>())
+    for (auto entity : registry.view<entt::entity>())
     {
         if (const auto* pos = registry.try_get<const Components::PositionT>(entity))
         {
