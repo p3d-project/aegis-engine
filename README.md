@@ -22,7 +22,7 @@ The Aegis engine was named as such for two reasons:
 Refer to [P3D Aegis Engine v2 HLD](https://docs.google.com/document/d/1earODRhL6BscfMGfGM2qVblGMRSetTuKtAmm_4TKdcw/edit?usp=sharing)
 
 ## Building & Running
-This repo has the `debug`, `release` and `default` (alais of `debug`) CMake presets.
+This repo has the `debug`, `release` and `default` (alias of `debug`) CMake presets.
 
 ```bash
 cmake --preset <preset>
