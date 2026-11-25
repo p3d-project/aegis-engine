@@ -8,7 +8,7 @@
             "forcedInclude": [
                 "${workspaceFolder}/include/vscode_fix.hpp"
             ],
-            "compileCommands": "${workspaceFolder}/out/build/host-debug/compile_commands.json",
+            "compileCommands": "${workspaceFolder}/out/build/debug/compile_commands.json",
             "includePath": [
                 "${workspaceFolder}/include/**",
                 "${workspaceFolder}/source/**",
