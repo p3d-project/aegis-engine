@@ -6,10 +6,10 @@
 	url = https://github.com/ETLCPP/etl.git
 [submodule "libs/googletest"]
 	path = libs/googletest
-	url = https://github.com/google/googletest
+	url = https://github.com/google/googletest.git
 [submodule "libs/entt"]
 	path = libs/entt
-	url = git@github.com:skypjack/entt.git
+	url = https://github.com/skypjack/entt.git
 [submodule "libs/flatbuffers"]
 	path = libs/flatbuffers
-	url = git@github.com:google/flatbuffers.git
+	url = https://github.com/google/flatbuffers.git
