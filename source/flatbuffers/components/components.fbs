@@ -1,16 +1,16 @@
 namespace Components;
 // TODO: add fpm support
 
-table Position {
+struct Position {
   x:float;
   y:float;
 }
 
-table Velocity {
+struct Velocity {
   dx:float;
   dy:float;
 }
 
-table Input {
+struct Input {
   key:int;
 }
