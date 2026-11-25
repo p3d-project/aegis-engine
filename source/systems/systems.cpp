@@ -13,16 +13,16 @@ void exampleSystem(entt::registry& registry)
 {
     for (auto entity : registry.view<entt::entity>())
     {
-        if (const auto* pos = registry.try_get<const Components::PositionT>(entity))
+        if (const auto* pos = registry.try_get<const Components::Position>(entity))
         {
-            printf("pos:x - %f\n", pos->x);
-            printf("pos:y - %f\n", pos->y);
+            printf("pos:x - %f\n", pos->x());
+            printf("pos:y - %f\n", pos->y());
         }
 
-        if (const auto* vel = registry.try_get<const Components::VelocityT>(entity))
+        if (const auto* vel = registry.try_get<const Components::Velocity>(entity))
         {
-            printf("vel:dx - %f\n", vel->dx);
-            printf("vel:dy - %f\n", vel->dy);
+            printf("vel:dx - %f\n", vel->dx());
+            printf("vel:dy - %f\n", vel->dy());
         }
     }
 

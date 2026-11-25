@@ -35,15 +35,15 @@ void loadScene(entt::registry& registry, const Scenes::SceneDefT& sceneDef)
         // add components
         if (sceneEntity->position)
         {
-            registry.emplace<Components::PositionT>(entity, *sceneEntity->position);
+            registry.emplace<Components::Position>(entity, *sceneEntity->position);
         }
         if (sceneEntity->velocity)
         {
-            registry.emplace<Components::VelocityT>(entity, *sceneEntity->velocity);
+            registry.emplace<Components::Velocity>(entity, *sceneEntity->velocity);
         }
         if (sceneEntity->input)
         {
-            registry.emplace<Components::InputT>(entity, *sceneEntity->input);
+            registry.emplace<Components::Input>(entity, *sceneEntity->input);
         }
     }
 }

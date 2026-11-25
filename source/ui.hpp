@@ -124,10 +124,11 @@ class UIButton : public UIWidget
         printf("[Button: %s]", label_.c_str());
         printf("\n");
 
-        auto view = registry.view<Components::InputT>();
+        auto view = registry.view<Components::Input>();
         for (auto [entity, input] : view.each())
         {
-            if (input.key == 1)
+            (void)entity;
+            if (input.key() == 1)
             {
                 onClick_();
             }
