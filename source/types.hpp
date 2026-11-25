@@ -6,6 +6,7 @@
  * @author  ...
  */
 
+#pragma once
 #include <fpm/fixed.hpp>
 
 namespace aegis

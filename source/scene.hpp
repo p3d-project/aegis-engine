@@ -4,6 +4,7 @@
  * @author  Taha Rashid (TheBossT910 / thebosst)
 **/
 
+#pragma once
 #include "scenes_generated.h"
 #include <entt/entt.hpp>
 

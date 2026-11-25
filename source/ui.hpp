@@ -4,6 +4,7 @@
  * @author  Taha Rashid (TheBossT910 / thebosst)
 **/
 
+#pragma once
 #include "components_generated.h"
 #include <entt/entt.hpp>
 #include <etl/span.h>

@@ -4,6 +4,7 @@
  *          by libnds. Use q20_12_t for standard usage.
  */
 
+#pragma once
 #include <fpm/fixed.hpp>
 namespace aegis
 {
