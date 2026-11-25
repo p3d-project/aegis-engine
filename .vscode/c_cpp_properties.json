@@ -8,10 +8,13 @@
             "forcedInclude": [
                 "${workspaceFolder}/include/vscode_fix.hpp"
             ],
-            "compileCommands": "${workspaceFolder}/out/build/debug/compile_commands.json",
+            "compileCommands": [
+                "${workspaceFolder}/out/build/debug/compile_commands.json"
+            ],
             "includePath": [
                 "${workspaceFolder}/include/**",
                 "${workspaceFolder}/source/**",
+                "${workspaceFolder}/out/build/debug/aegis_flatbuffers",
                 "${workspaceFolder}/libs/entt/src",
                 "${workspaceFolder}/libs/flatbuffers/include",
                 "${workspaceFolder}/libs/etl/include",

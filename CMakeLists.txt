@@ -56,7 +56,7 @@ endforeach()
 add_library(aegis_engine_lib INTERFACE)
 add_library(aegis::engine ALIAS aegis_engine_lib)
 
-target_compile_features(aegis_engine_lib INTERFACE cxx_std_20)
+target_compile_features(aegis_engine_lib INTERFACE cxx_std_23)
 target_include_directories(aegis_engine_lib INTERFACE
     libs/etl/include
     libs/fpm/include
