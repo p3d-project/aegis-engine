@@ -8,13 +8,16 @@
 
 void ui(entt::registry& registry)
 {
-    UILabel title(2, 0, "AEGIS Engine");
-    UILabel startStatus(4, 0, "Ready");
-    UIButton start(
-        2, 1, 1, 12, "Start", etl::delegate<void()>::create(+[]() { printf("  [action: start clicked]\n"); }));
-    UIPanel panel(0, 0, "Main Menu");
-    UIButton quit(0, 2, 1, 12, "Quit", etl::delegate<void()>::create(+[]() { printf("  [action: quit clicked]\n"); }));
-    UIWidget uiExample(0, 0);
+    UIWidget title(2, 0, UILabel("AEGIS Engine"));
+    UIWidget startStatus(4, 0, UILabel("Ready"));
+    UIWidget start(
+        2,
+        1,
+        UIButton(1, 12, "Start", etl::delegate<void()>::create(+[]() { printf("  [action: start clicked]\n"); })));
+    UIWidget panel(0, 0, UIPanel("Main Menu"));
+    UIWidget quit(
+        0, 2, UIButton(1, 12, "Quit", etl::delegate<void()>::create(+[]() { printf("  [action: quit clicked]\n"); })));
+    UIWidget uiExample(0, 0, UIRoot());
 
     uiExample.addChild(panel.addChild(title).addChild(start.addChild(startStatus))).addChild(quit);
 
