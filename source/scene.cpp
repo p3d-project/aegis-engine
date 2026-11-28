@@ -48,9 +48,9 @@ void loadScene(entt::registry& registry, const Scenes::SceneDefT& sceneDef)
     }
 }
 
-void loadScene(entt::registry& registry, const char* binaryPath)
+void loadScene(entt::registry& registry, etl::string_view binaryPath)
 {
-    std::ifstream file(binaryPath, std::ios::binary);
+    std::ifstream file(binaryPath.data(), std::ios::binary);
     // TODO: replace std::vector with etl::vector
     const std::vector<std::uint8_t> buffer{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
 
